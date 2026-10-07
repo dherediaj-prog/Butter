@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "ButterKnife Bridge",
+  "version": "1.2",
+  "description": "Bridge de automatización directa para modelos de IA",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://chat.deepseek.com/*"
+      ],
+      "js": [
+        "Constants/MessageActionConstants.js",
+        "Constants/MessageStatusConstants.js",
+        "Entities/SyncedState.js",
+        "Entities/IAProviderMetadata.js",
+        "Services/ConfigService.js",
+        "Services/IAProviderService.js",
+        "Services/WebSocketService.js",
+        "butterKnife.js"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}

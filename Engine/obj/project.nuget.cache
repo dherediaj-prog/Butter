@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "dhPHV+lENjY=",
+  "success": true,
+  "projectFilePath": "D:\\Resources\\Projects\\Embroidery\\Butter\\Engine\\Engine.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\USUARIO\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.12\\microsoft.extensions.dependencyinjection.10.0.12.nupkg.sha512",
+    "C:\\Users\\USUARIO\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.12\\microsoft.extensions.dependencyinjection.abstractions.10.0.12.nupkg.sha512"
+  ],
+  "logs": []
+}

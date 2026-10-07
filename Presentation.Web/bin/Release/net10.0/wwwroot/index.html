@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ButterKnife - Remote Support Panel</title>
+    <link rel="stylesheet" href="extension/styles.css">
+</head>
+<body>
+
+<h2>ButterKnife - Panel de Control & Pruebas</h2>
+
+<div class="box">
+    <h3>1. Estado WebSocket</h3>
+    <div>Estado: <span id="status" class="status status-off">Desconectado</span></div>
+    <button id="btn-reconnect">Reconectar WebSocket</button>
+</div>
+
+<div class="box">
+    <h3>2. Extensión ButterKnife Browser</h3>
+    <div style="color: #aaa; font-size: 12px; margin-bottom: 8px;">Descarga el paquete listo para descomprimir e importar en Chrome / Edge.</div>
+    <button id="btn-download-ext" class="btn-download">Descargar Extensión (.zip)</button>
+</div>
+
+<div class="box">
+    <h3>3. Captura Recibida de Butter</h3>
+    <div id="preview-container">
+        <img id="captured-image" alt="Previsualización de recorte">
+    </div>
+    <div id="no-capture-text">Esperando captura...</div>
+</div>
+
+<div class="box">
+    <h3>4. Simular Respuesta IA (WebSocket &rarr; Overlay)</h3>
+    <textarea id="aiText" rows="3" style="width: 100%;" placeholder="Escribe la respuesta simulada..."></textarea><br>
+    <button id="btn-send-response">Enviar a Overlay Pasivo</button>
+</div>
+
+<div class="box">
+    <h3>5. Simular Prompt desde Breadcrumb (WebSocket &rarr; Extensiones)</h3>
+    <input type="text" id="promptText" placeholder="Pregunta desde la PC..." style="width: 70%;">
+    <button id="btn-send-prompt">Enviar Prompt por WebSocket</button>
+</div>
+
+<div class="box">
+    <h3>Logs del Sistema</h3>
+    <div id="logs"></div>
+</div>
+
+<script src="extension/constants/MessageActionConstants.js"></script>
+<script src="extension/constants/MessageStatusConstants.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

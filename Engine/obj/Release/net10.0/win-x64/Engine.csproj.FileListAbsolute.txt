@@ -1,0 +1,12 @@
+D:\Resources\Projects\Embroidery\Butter\Engine\bin\Release\net10.0\win-x64\Engine.deps.json
+D:\Resources\Projects\Embroidery\Butter\Engine\bin\Release\net10.0\win-x64\Engine.dll
+D:\Resources\Projects\Embroidery\Butter\Engine\bin\Release\net10.0\win-x64\Engine.pdb
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\Engine.csproj.AssemblyReference.cache
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\Engine.GeneratedMSBuildEditorConfig.editorconfig
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\Engine.AssemblyInfoInputs.cache
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\Engine.AssemblyInfo.cs
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\Engine.csproj.CoreCompileInputs.cache
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\Engine.dll
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\refint\Engine.dll
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\Engine.pdb
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\win-x64\ref\Engine.dll

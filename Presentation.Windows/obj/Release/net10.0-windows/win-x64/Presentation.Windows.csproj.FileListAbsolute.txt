@@ -1,0 +1,15 @@
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\bin\Release\net10.0-windows\win-x64\Presentation.Windows.deps.json
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\bin\Release\net10.0-windows\win-x64\Presentation.Windows.dll
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\bin\Release\net10.0-windows\win-x64\Presentation.Windows.pdb
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\bin\Release\net10.0-windows\win-x64\Engine.dll
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\bin\Release\net10.0-windows\win-x64\Engine.pdb
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presentation.Windows.csproj.AssemblyReference.cache
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presentation.Windows.GeneratedMSBuildEditorConfig.editorconfig
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presentation.Windows.AssemblyInfoInputs.cache
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presentation.Windows.AssemblyInfo.cs
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presentation.Windows.csproj.CoreCompileInputs.cache
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presenta.84795094.Up2Date
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presentation.Windows.dll
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\refint\Presentation.Windows.dll
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\Presentation.Windows.pdb
+D:\Resources\Projects\Embroidery\Butter\Presentation.Windows\obj\Release\net10.0-windows\win-x64\ref\Presentation.Windows.dll

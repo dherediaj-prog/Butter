@@ -1,0 +1,12 @@
+D:\Resources\Projects\Embroidery\Butter\Engine\bin\Release\net10.0\Engine.deps.json
+D:\Resources\Projects\Embroidery\Butter\Engine\bin\Release\net10.0\Engine.dll
+D:\Resources\Projects\Embroidery\Butter\Engine\bin\Release\net10.0\Engine.pdb
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\Engine.csproj.AssemblyReference.cache
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\Engine.GeneratedMSBuildEditorConfig.editorconfig
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\Engine.AssemblyInfoInputs.cache
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\Engine.AssemblyInfo.cs
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\Engine.csproj.CoreCompileInputs.cache
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\Engine.dll
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\refint\Engine.dll
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\Engine.pdb
+D:\Resources\Projects\Embroidery\Butter\Engine\obj\Release\net10.0\ref\Engine.dll
