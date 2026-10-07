@@ -1,7 +1,6 @@
 using System.Drawing.Imaging;
-using Engine.Services;
 
-namespace Presentation.Windows.Services;
+namespace Engine.Services.ScreenCapture;
 
 public class Win32ScreenCaptureService : IScreenCaptureService
 {

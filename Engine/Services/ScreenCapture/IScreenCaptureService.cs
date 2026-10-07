@@ -1,6 +1,4 @@
-using System.Drawing;
-
-namespace Engine.Services;
+namespace Engine.Services.ScreenCapture;
 
 public interface IScreenCaptureService
 {

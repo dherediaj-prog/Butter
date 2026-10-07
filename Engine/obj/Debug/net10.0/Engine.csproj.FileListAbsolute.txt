@@ -10,3 +10,16 @@ D:\Resources\Projects\Embroidery\Butter\Engine\obj\Debug\net10.0\Engine.dll
 D:\Resources\Projects\Embroidery\Butter\Engine\obj\Debug\net10.0\refint\Engine.dll
 D:\Resources\Projects\Embroidery\Butter\Engine\obj\Debug\net10.0\Engine.pdb
 D:\Resources\Projects\Embroidery\Butter\Engine\obj\Debug\net10.0\ref\Engine.dll
+C:\Users\MSI\Projects\Butter\Engine\bin\Debug\net10.0\Engine.deps.json
+C:\Users\MSI\Projects\Butter\Engine\bin\Debug\net10.0\Engine.dll
+C:\Users\MSI\Projects\Butter\Engine\bin\Debug\net10.0\Engine.pdb
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.csproj.AssemblyReference.cache
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.AssemblyInfoInputs.cache
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.AssemblyInfo.cs
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.csproj.CoreCompileInputs.cache
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.sourcelink.json
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.dll
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\refint\Engine.dll
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\Engine.pdb
+C:\Users\MSI\Projects\Butter\Engine\obj\Debug\net10.0\ref\Engine.dll

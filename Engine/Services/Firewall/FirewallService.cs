@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Presentation.Windows.Services;
+namespace Engine.Services.Firewall;
 
 public static class FirewallService
 {

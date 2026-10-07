@@ -3,10 +3,12 @@ using System.Net.WebSockets;
 using System.Text.Json;
 using Engine.Entities.Overlays;
 using Engine.Entities.Selections;
-using Presentation.Web.Constants;
-using Presentation.Web.Models;
+using Engine.Presentation.Web.Constants;
+using Engine.Presentation.Web.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
-namespace Presentation.Web.Services;
+namespace Engine.Presentation.Web.Services;
 
 public partial class WebBridgeService
 {
@@ -73,10 +75,12 @@ public partial class WebBridgeService
                     _ => action.Text ?? string.Empty
                 };
                 _overlay.UpdateResponseText(displayText);
+                _overlay.SetVisibility(true);
                 break;
 
             case MessageAction.Error:
                 _overlay.UpdateResponseText($"Error: {action.Error ?? "Error desconocido en el proveedor"}");
+                _overlay.SetVisibility(true);
                 break;
 
             case MessageAction.TriggerSelection:

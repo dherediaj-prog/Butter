@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using Engine.Entities.Overlays;
 using Engine.Entities.Selections;
 
-namespace Presentation.Windows;
+namespace Engine.Presentation.Windows;
 
 public class NativeHotkeyListener : Form
 {
@@ -66,7 +66,6 @@ public class NativeHotkeyListener : Form
             else if (hotkeyId == EXIT_HOTKEY_ID)
             {
                 Application.Exit();
-                Environment.Exit(0);
             }
         }
         base.WndProc(ref m);

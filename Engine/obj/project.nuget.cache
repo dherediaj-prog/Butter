@@ -1,11 +1,23 @@
 {
   "version": 2,
-  "dgSpecHash": "dhPHV+lENjY=",
+  "dgSpecHash": "JGD6A/8opQA=",
   "success": true,
-  "projectFilePath": "D:\\Resources\\Projects\\Embroidery\\Butter\\Engine\\Engine.csproj",
+  "projectFilePath": "C:\\Users\\MSI\\Projects\\Butter\\Engine\\Engine.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\USUARIO\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.12\\microsoft.extensions.dependencyinjection.10.0.12.nupkg.sha512",
-    "C:\\Users\\USUARIO\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.12\\microsoft.extensions.dependencyinjection.abstractions.10.0.12.nupkg.sha512"
+    "C:\\Users\\MSI\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.12\\microsoft.extensions.dependencyinjection.10.0.12.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.DependencyInjection will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "C:\\Users\\MSI\\Projects\\Butter\\Engine\\Engine.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\MSI\\Projects\\Butter\\Engine\\Engine.csproj",
+      "libraryId": "Microsoft.Extensions.DependencyInjection",
+      "targetGraphs": [
+        "net10.0-windows7.0"
+      ]
+    }
+  ]
 }

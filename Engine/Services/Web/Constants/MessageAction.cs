@@ -1,4 +1,4 @@
-namespace Presentation.Web.Constants;
+namespace Engine.Presentation.Web.Constants;
 
 public static class MessageAction
 {

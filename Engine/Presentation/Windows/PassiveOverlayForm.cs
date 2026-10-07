@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Engine.Entities.Overlays;
 
-namespace Presentation.Windows;
+namespace Engine.Presentation.Windows;
 
 public class PassiveOverlayForm : Form
 {

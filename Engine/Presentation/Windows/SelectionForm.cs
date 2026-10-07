@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Engine.Entities.Selections;
 
-namespace Presentation.Windows;
+namespace Engine.Presentation.Windows;
 
 public class SelectionForm : Form
 {
@@ -70,6 +70,7 @@ public class SelectionForm : Form
         // Interceptar la tecla ESC para cerrar y cancelar
         if (m.Msg == WM_HOTKEY && m.WParam.ToInt32() == ESC_HOTKEY_ID)
         {
+            _selection.Cancel();
             Close();
             return;
         }
@@ -92,6 +93,7 @@ public class SelectionForm : Form
     {
         if (e.Button == MouseButtons.Left)
         {
+            Hide();
             _selection.Complete();
             Close();
         }

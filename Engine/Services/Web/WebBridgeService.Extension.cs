@@ -1,6 +1,7 @@
 using System.IO.Compression;
+using Microsoft.AspNetCore.Http;
 
-namespace Presentation.Web.Services;
+namespace Engine.Presentation.Web.Services;
 
 public partial class WebBridgeService
 {

@@ -1,0 +1,33 @@
+﻿## --- C# / .NET Standard ---
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.userosscache
+*.sln.docstates
+
+## --- NuGet ---
+*.nuget.props
+*.nuget.targets
+*.nupkg
+
+## --- IDE: JetBrains Rider & Visual Studio ---
+.idea/
+.vs/
+*.suo
+*.user
+/shelf/
+/workspace.xml
+/projectSettingsUpdater.xml
+/contentModel.xml
+/modules.xml
+/.idea.*
+/httpRequests/
+/queries/
+/dataSources/
+/dataSources.local.xml
+
+## --- OS Generated ---
+.DS_Store
+Thumbs.db
