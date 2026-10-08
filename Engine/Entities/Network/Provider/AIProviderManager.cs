@@ -52,6 +52,6 @@ public class AIProviderManager
     }
 
     public AIProvider? GetBySocket(WebSocket socket) => _providers.GetValueOrDefault(socket);
-    public AIProvider? GetById(string id) => _providers.Values.FirstOrDefault(p => p.Metadata?.Id == id);
+    public AIProvider? GetById(string id) => _providers.Values.FirstOrDefault(p => p.Id == id);
     public IEnumerable<AIProvider> GetConnected() => _providers.Values.Where(p => p.IsConnected);
 }

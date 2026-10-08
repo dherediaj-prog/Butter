@@ -19,7 +19,7 @@ public static class WebBootstrap
         app.UseWebSockets();
 
         var transport = app.Services.GetRequiredService<WebSocketTransport>();
-        var dispatcher = app.Services.GetRequiredService<WebSocketMessageDispatcher>();
+        var dispatcher = app.Services.GetRequiredService<MessageDispatcher>();
         var hotkeyListener = app.Services.GetRequiredService<NativeHotkeyListener>();
 
         // Endpoint principal de WebSocket para comunicación con la extensión/clientes

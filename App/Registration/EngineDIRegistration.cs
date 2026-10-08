@@ -23,7 +23,7 @@ public static class EngineDIRegistration
         // --- Servicios Web, WebSocket y AI ---
         services.AddSingleton<AIProviderManager>();
         services.AddSingleton<WebSocketTransport>();
-        services.AddSingleton<WebSocketMessageDispatcher>();
+        services.AddSingleton<MessageDispatcher>();
 
         // --- Captura de Pantalla ---
         services.AddSingleton<IScreenCaptureService, Win32ScreenCaptureService>();

@@ -1,8 +1,10 @@
 using System.Text.Json;
 using Engine.Entities.Network.MessageHandler.Interfaces;
+using Engine.Entities.Network.MessageHandler.Payloads;
 using Engine.Entities.Network.Provider;
 using Engine.Entities.Network.Provider.DTO;
 using Engine.Entities.Network.Provider.Enums;
+using Engine.Entities.Network.Provider.Extensions;
 using Engine.Entities.Overlays;
 
 namespace Engine.Entities.Network.MessageHandler.Implementations;
@@ -11,9 +13,6 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
 {
     private readonly Overlay _overlay;
 
-    /// <summary>
-    /// Acción de la envoltura WebSocket que procesa este handler.
-    /// </summary>
     public string Action => "AI_RESPONSE";
 
     public AIResponseMessageHandler(Overlay overlay)
@@ -33,7 +32,9 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
                 break;
 
             case ProviderStatus.Completed:
-                string textResult = ExtractResponseText(envelope.Payload);
+                var payload = envelope.GetPayload<AIResponsePayload>();
+                string textResult = payload?.Text ?? string.Empty;
+
                 _overlay.UpdateResponseText(string.IsNullOrWhiteSpace(textResult) ? "͡° ͜ʖ ͡°" : textResult);
                 _overlay.SetVisibility(true);
                 break;
@@ -47,30 +48,5 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
         }
 
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Extrae el texto plano del Payload JSON recibido.
-    /// </summary>
-    private static string ExtractResponseText(JsonElement payload)
-    {
-        if (payload.ValueKind == JsonValueKind.String)
-        {
-            return payload.GetString() ?? string.Empty;
-        }
-
-        if (payload.ValueKind == JsonValueKind.Object)
-        {
-            if (payload.TryGetProperty("text", out var textProp) ||
-                payload.TryGetProperty("response", out textProp) ||
-                payload.TryGetProperty("message", out textProp))
-            {
-                return textProp.GetString() ?? string.Empty;
-            }
-        }
-
-        return payload.ValueKind != JsonValueKind.Undefined && payload.ValueKind != JsonValueKind.Null
-            ? payload.ToString()
-            : string.Empty;
     }
 }

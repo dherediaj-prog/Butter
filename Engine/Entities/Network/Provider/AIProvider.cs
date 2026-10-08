@@ -4,33 +4,30 @@ using Engine.Entities.Network.Provider.DTO;
 
 namespace Engine.Entities.Network.Provider;
 
-public class AIProvider : IDisposable
+public class AIProvider(
+    WebSocket socket,
+    string? id = null,
+    AIProviderMetadata? metadata = null,
+    JsonSerializerOptions? jsonOptions = null)
+    : IDisposable
 {
-    public AIProviderMetadata? Metadata { get; private set; }
+    public string Id { get; } = string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString("N") : id;
+    public AIProviderMetadata? Metadata { get; private set; } = metadata;
     public DateTimeOffset ConnectedAt { get; } = DateTimeOffset.UtcNow;
-    public WebSocket Socket { get; }
+    public WebSocket Socket { get; } = socket ?? throw new ArgumentNullException(nameof(socket));
 
     public bool IsConnected => Socket.State == WebSocketState.Open;
 
-    private readonly JsonSerializerOptions _jsonOptions;
+    private readonly JsonSerializerOptions _jsonOptions = jsonOptions ?? new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly SemaphoreSlim _sendLock = new(1, 1);
     private bool _disposed;
 
     // --- Eventos de datos entrantes ---
     public event Func<ProviderEnvelope<JsonElement>, Task>? OnTextMessageReceived;
-
-    public AIProvider(
-        WebSocket socket,
-        AIProviderMetadata? metadata = null,
-        JsonSerializerOptions? jsonOptions = null)
-    {
-        Socket = socket ?? throw new ArgumentNullException(nameof(socket));
-        Metadata = metadata;
-        _jsonOptions = jsonOptions ?? new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-    }
 
     public async Task ListenAsync(CancellationToken ct = default)
     {
@@ -48,14 +45,12 @@ public class AIProvider : IDisposable
                     break;
                 }
 
-                // Optimización: Si el mensaje cabe en 1 solo frame (<8KB), no se asigna MemoryStream
                 if (result.EndOfMessage)
                 {
                     await ProcessIncomingFrameAsync(result.MessageType, buffer.AsMemory(0, result.Count));
                 }
                 else
                 {
-                    // Si viene fragmentado, acumulamos el mensaje completo
                     using var ms = new MemoryStream();
                     ms.Write(buffer, 0, result.Count);
 
@@ -82,7 +77,7 @@ public class AIProvider : IDisposable
         }
         catch (WebSocketException)
         {
-            // Conexión cortada o reseteada abruptamente por el cliente/red
+            // Conexión cortada o reseteada abruptamente
         }
     }
 
@@ -101,11 +96,12 @@ public class AIProvider : IDisposable
         }
         catch (Exception)
         {
-            // Evita que un fallo en el manejador del cliente detenga el bucle de escucha del Socket
+            // Evita que un fallo en la deserialización detenga el bucle
         }
     }
 
-    private async Task HandleCloseHandshakeAsync(WebSocketCloseStatus? status, string? description, CancellationToken ct)
+    private async Task HandleCloseHandshakeAsync(WebSocketCloseStatus? status, string? description,
+        CancellationToken ct)
     {
         if (Socket.State == WebSocketState.CloseReceived)
         {

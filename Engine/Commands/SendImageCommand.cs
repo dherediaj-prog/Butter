@@ -1,3 +1,4 @@
+using Engine.Commands.Payloads;
 using Engine.Entities.Network.ActiveAIProviderSelectors;
 using Engine.Entities.Network.Provider.Extensions;
 
@@ -21,11 +22,10 @@ public class SendImageCommand
         var provider = _selector.GetActiveConnectedProvider();
         if (provider is null || imageBytes.Length == 0) return;
 
-        var payload = new
-        {
-            image = Convert.ToBase64String(imageBytes),
-            mimeType
-        };
+        var payload = new IAAnalyzeImagePayload(
+            Image: Convert.ToBase64String(imageBytes),
+            MimeType: mimeType
+        );
 
         await provider.SendSuccessAsync("ANALYZE_IMAGE", payload, ct: ct);
     }

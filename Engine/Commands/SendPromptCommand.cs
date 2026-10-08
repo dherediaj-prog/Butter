@@ -1,3 +1,4 @@
+using Engine.Commands.Payloads;
 using Engine.Entities.Network.ActiveAIProviderSelectors;
 using Engine.Entities.Network.Provider.Extensions;
 
@@ -18,6 +19,7 @@ public class SendPromptCommand
         var provider = _selector.GetActiveConnectedProvider();
         if (provider is null || string.IsNullOrWhiteSpace(prompt)) return;
 
-        await provider.SendSuccessAsync("ASK", new { prompt }, ct: ct);
+        var payload = new AskPayload(prompt);
+        await provider.SendSuccessAsync("ASK", payload, ct: ct);
     }
 }

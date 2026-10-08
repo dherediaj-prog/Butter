@@ -7,7 +7,7 @@ using Engine.Entities.Network.Provider.DTO;
 
 namespace Engine.Entities.Network.MessageHandler;
 
-public class WebSocketMessageDispatcher
+public class MessageDispatcher
 {
     private readonly ConcurrentDictionary<string, IWebSocketMessageHandler> _handlers =
         new(StringComparer.OrdinalIgnoreCase);
@@ -15,7 +15,7 @@ public class WebSocketMessageDispatcher
     private AIProvider? _activeProvider;
     private Func<ProviderEnvelope<JsonElement>, Task>? _activeCallback;
 
-    public WebSocketMessageDispatcher(
+    public MessageDispatcher(
         ActiveAIProviderSelector activeProviderSelector,
         IEnumerable<IWebSocketMessageHandler>? handlers = null)
     {
@@ -38,7 +38,7 @@ public class WebSocketMessageDispatcher
         }
     }
 
-    public WebSocketMessageDispatcher RegisterHandler(IWebSocketMessageHandler handler)
+    public MessageDispatcher RegisterHandler(IWebSocketMessageHandler handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
         _handlers[handler.Action] = handler;
