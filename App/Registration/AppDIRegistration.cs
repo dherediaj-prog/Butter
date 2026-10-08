@@ -11,6 +11,7 @@ public static class AppDIRegistration
         services.AddRouting();
         services.AddEngineDI();
         services.AddWindowsDI();
+
         return services;
     }
 }

@@ -1,3 +1,4 @@
+using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using Engine.Entities.Selections;
 
@@ -15,7 +16,6 @@ public class SelectionForm : Form
 
     private const int ESC_HOTKEY_ID = 9002;
     private const int WM_HOTKEY = 0x0312;
-    private const uint VK_ESCAPE = 0x1B;
 
     private const int WM_MOUSEACTIVATE = 0x0021;
     private const int MA_NOACTIVATE = 3;
@@ -34,8 +34,11 @@ public class SelectionForm : Form
         Cursor = Cursors.Cross;
 
         DoubleBuffered = true;
-        BackColor = Color.Black;
-        Opacity = 0.05; 
+
+        // Configuración para permitir transparencia completa sin perder opacidad en lo que se dibuja
+        BackColor = Color.Magenta;
+        TransparencyKey = Color.Magenta;
+        Opacity = 1.0;
 
         _selection.Changed += Invalidate;
     }
@@ -55,8 +58,8 @@ public class SelectionForm : Form
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        // Registrar ESC para cancelar la selección
-        RegisterHotKey(Handle, ESC_HOTKEY_ID, 0x0000, VK_ESCAPE);
+        // Cast directo desde la enumeración Keys de WinForms
+        RegisterHotKey(Handle, ESC_HOTKEY_ID, 0x0000, (uint)Keys.Escape);
     }
 
     protected override void WndProc(ref Message m)
@@ -67,7 +70,6 @@ public class SelectionForm : Form
             return;
         }
 
-        // Interceptar la tecla ESC para cerrar y cancelar
         if (m.Msg == WM_HOTKEY && m.WParam.ToInt32() == ESC_HOTKEY_ID)
         {
             _selection.Cancel();
@@ -101,13 +103,55 @@ public class SelectionForm : Form
 
     protected override void OnPaint(PaintEventArgs e)
     {
-        if (!_selection.IsSelecting) return;
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        using var pen = new Pen(Color.FromArgb(220, 255, 0, 0), 2);
-        e.Graphics.DrawRectangle(pen, _selection.Bounds);
-        
-        using var brush = new SolidBrush(Color.FromArgb(10, 255, 0, 0));
-        e.Graphics.FillRectangle(brush, _selection.Bounds);
+        // 1. Renderizar el fondo de pantalla según la configuración del objeto Selection
+        if (_selection.OverlayColor != Color.Transparent && _selection.OverlayColor.A > 0)
+        {
+            using var overlayBrush = new SolidBrush(_selection.OverlayColor);
+
+            // Si hay un fondo visible y se está seleccionando, recortamos el rectángulo para dar mayor claridad
+            if (_selection.IsSelecting && !_selection.Bounds.IsEmpty)
+            {
+                using var region = new Region(ClientRectangle);
+                region.Exclude(_selection.Bounds);
+                g.FillRegion(overlayBrush, region);
+            }
+            else
+            {
+                g.FillRectangle(overlayBrush, ClientRectangle);
+            }
+        }
+        else
+        {
+            // Fondo transparente: Relleno con Alfa=1 (diferente de TransparencyKey)
+            // para permitir capturar clics de mouse en toda la pantalla sin oscurecer la vista.
+            using var hitTestBrush = new SolidBrush(Color.FromArgb(1, 0, 0, 0));
+            g.FillRectangle(hitTestBrush, ClientRectangle);
+        }
+
+        // 2. Renderizar el área de selección activa
+        if (!_selection.IsSelecting || _selection.Bounds.IsEmpty) return;
+
+        var bounds = _selection.Bounds;
+
+        // Relleno interno
+        if (_selection.FillColor.A > 0)
+        {
+            using var fillBrush = new SolidBrush(_selection.FillColor);
+            g.FillRectangle(fillBrush, bounds);
+        }
+
+        // Borde exterior
+        if (_selection.BorderColor.A > 0 && _selection.BorderWidth > 0)
+        {
+            using var borderPen = new Pen(_selection.BorderColor, _selection.BorderWidth)
+            {
+                DashStyle = _selection.BorderStyle
+            };
+            g.DrawRectangle(borderPen, bounds);
+        }
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)

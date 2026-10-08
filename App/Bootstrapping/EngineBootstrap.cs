@@ -1,8 +1,12 @@
+using Engine.Entities.Network.Provider;
 using Engine.Entities.Overlays;
+using Engine.Entities.Overlays.Enums;
+using Engine.Entities.PanelTriggers;
+using Engine.Entities.PanelTriggers.Enums;
 using Engine.Entities.Selections;
 using Engine.Helpers;
-using Engine.Presentation.Web.Services;
 using Engine.Presentation.Windows;
+using Engine.Services.AI;
 using Engine.Services.ScreenCapture;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,8 +19,9 @@ public static class EngineBootstrap
         ArgumentNullException.ThrowIfNull(provider);
 
         var overlay = provider.GetRequiredService<Overlay>();
+        var panelTrigger = provider.GetRequiredService<PanelTrigger>();
         var selection = provider.GetRequiredService<Selection>();
-        var webHandler = provider.GetRequiredService<WebBridgeService>();
+        var aiProviderManager = provider.GetRequiredService<AIProviderManager>();
         var captureService = provider.GetRequiredService<IScreenCaptureService>();
         var passiveOverlay = provider.GetRequiredService<PassiveOverlayForm>();
         var hotkeyListener = provider.GetRequiredService<NativeHotkeyListener>();
@@ -49,9 +54,14 @@ public static class EngineBootstrap
             try
             {
                 overlay.SetPosition(bounds.X, bounds.Y);
+                panelTrigger.AnchorTo(bounds, AnchorAlignment.TopRight);
+                panelTrigger.Show();
+
                 var imageBytes = captureService.CaptureRegion(bounds);
                 if (imageBytes.Length > 0)
-                    await webHandler.SendImageAsync(imageBytes);
+                {
+                    await aiProviderManager.SendImageAsync(imageBytes);
+                }
             }
             catch (Exception exception)
             {
@@ -64,8 +74,14 @@ public static class EngineBootstrap
             }
         };
 
+        selection.Cancelled += () =>
+        {
+            panelTrigger.Hide();
+        };
+
         passiveOverlay.Show();
         _ = hotkeyListener.Handle;
+
         return provider;
     }
 }

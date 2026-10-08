@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "JGD6A/8opQA=",
+  "dgSpecHash": "GGYNizratCY=",
   "success": true,
   "projectFilePath": "C:\\Users\\MSI\\Projects\\Butter\\Engine\\Engine.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\MSI\\.nuget\\packages\\idisposableanalyzers\\4.0.8\\idisposableanalyzers.4.0.8.nupkg.sha512",
     "C:\\Users\\MSI\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.12\\microsoft.extensions.dependencyinjection.10.0.12.nupkg.sha512"
   ],
   "logs": [

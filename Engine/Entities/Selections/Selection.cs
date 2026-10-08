@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Engine.Entities.Selections;
 
@@ -10,11 +11,38 @@ public class Selection
 
     public Rectangle Bounds => CalculateBounds(StartPoint, CurrentPoint);
 
+    // --- Propiedades de Estilo de la Selección ---
+    
+    /// <summary>
+    /// Color del borde del rectángulo de selección.
+    /// </summary>
+    public Color BorderColor { get; set; } = Color.FromArgb(255, 0, 120, 215); // Azul acentuado brillante
+
+    /// <summary>
+    /// Color de relleno interno del área seleccionada.
+    /// </summary>
+    public Color FillColor { get; set; } = Color.FromArgb(45, 0, 120, 215);    // Relleno suave y visible
+
+    /// <summary>
+    /// Ancho del trazo del borde en píxeles.
+    /// </summary>
+    public float BorderWidth { get; set; } = 2f;
+
+    /// <summary>
+    /// Estilo de la línea del borde (Sólido, Discontinuo, etc.).
+    /// </summary>
+    public DashStyle BorderStyle { get; set; } = DashStyle.Solid;
+
+    /// <summary>
+    /// Color de fondo para toda la pantalla. Por defecto es transparente (Color.Transparent).
+    /// Si se desea oscurecer la pantalla se puede asignar ej: Color.FromArgb(100, 0, 0, 0).
+    /// </summary>
+    public Color OverlayColor { get; set; } = Color.Transparent;
+
+    // --- Eventos ---
     public event Action? Changed;
     public event Action<Rectangle>? Completed;
     public event Action? Cancelled;
-    
-    // Evento y método para desencadenar la orden de captura
     public event Action? SelectionRequested;
 
     public void RequestSelection() => SelectionRequested?.Invoke();

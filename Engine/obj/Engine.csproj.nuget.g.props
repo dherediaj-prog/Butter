@@ -12,4 +12,7 @@
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <SourceRoot Include="C:\Users\MSI\.nuget\packages\" />
   </ItemGroup>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgIDisposableAnalyzers Condition=" '$(PkgIDisposableAnalyzers)' == '' ">C:\Users\MSI\.nuget\packages\idisposableanalyzers\4.0.8</PkgIDisposableAnalyzers>
+  </PropertyGroup>
 </Project>

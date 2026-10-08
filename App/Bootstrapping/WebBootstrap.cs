@@ -1,5 +1,6 @@
 using System.Net;
-using Engine.Presentation.Web.Services;
+using Engine.Entities.Network.MessageHandler;
+using Engine.Entities.Network.Transport;
 using Engine.Presentation.Windows;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -17,20 +18,23 @@ public static class WebBootstrap
         app.UseStaticFiles();
         app.UseWebSockets();
 
-        var webHandler = app.Services.GetRequiredService<WebBridgeService>();
+        var transport = app.Services.GetRequiredService<WebSocketTransport>();
+        var dispatcher = app.Services.GetRequiredService<WebSocketMessageDispatcher>();
         var hotkeyListener = app.Services.GetRequiredService<NativeHotkeyListener>();
 
-        app.Map("/ws/chat", webHandler.HandleWebSocketAsync);
-        app.MapGet("/api/extension/download", webHandler.HandleExtensionDownload);
-        app.MapPost("/api/shutdown", (HttpContext context) =>
+        // Endpoint principal de WebSocket para comunicación con la extensión/clientes
+        app.Map("/ws/chat", async (HttpContext context) =>
         {
-            if (context.Connection.RemoteIpAddress is not { } address || !IPAddress.IsLoopback(address))
-                return Results.StatusCode(StatusCodes.Status403Forbidden);
-
-            hotkeyListener.BeginInvoke((Action)Application.Exit);
-            return Results.Ok(new { message = "Shutting down..." });
+            if (context.WebSockets.IsWebSocketRequest)
+            {
+                using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                await transport.HandleConnectionAsync(webSocket, dispatcher);
+            }
+            else
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
         });
-
         return app;
     }
 }

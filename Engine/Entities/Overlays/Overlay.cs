@@ -1,4 +1,3 @@
-using System.Drawing;
 using Engine.Entities.Overlays.EventArgs;
 
 namespace Engine.Entities.Overlays;

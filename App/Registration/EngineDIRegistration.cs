@@ -1,6 +1,9 @@
+using Engine.Entities.Network.MessageHandler;
+using Engine.Entities.Network.Provider;
+using Engine.Entities.Network.Transport;
 using Engine.Entities.Overlays;
+using Engine.Entities.PanelTriggers;
 using Engine.Entities.Selections;
-using Engine.Presentation.Web.Services;
 using Engine.Services.ScreenCapture;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,10 +15,19 @@ public static class EngineDIRegistration
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        // --- Entidades ---
         services.AddSingleton<Overlay>();
+        services.AddSingleton<PanelTrigger>();
         services.AddSingleton<Selection>();
-        services.AddSingleton<WebBridgeService>();
+
+        // --- Servicios Web, WebSocket y AI ---
+        services.AddSingleton<AIProviderManager>();
+        services.AddSingleton<WebSocketTransport>();
+        services.AddSingleton<WebSocketMessageDispatcher>();
+
+        // --- Captura de Pantalla ---
         services.AddSingleton<IScreenCaptureService, Win32ScreenCaptureService>();
+
         return services;
     }
 }

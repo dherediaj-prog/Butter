@@ -2,6 +2,9 @@
   "version": 4,
   "targets": {
     "net10.0-windows": {
+      "IDisposableAnalyzers/4.0.8": {
+        "type": "package"
+      },
       "Microsoft.Extensions.DependencyInjection/10.0.12": {
         "type": "package",
         "compile": {
@@ -21,6 +24,21 @@
     }
   },
   "libraries": {
+    "IDisposableAnalyzers/4.0.8": {
+      "sha512": "vNi4NMG0CcJyjXxiNDcQ21FwV/whM9o9OEZKD+oP7tuxAqFEzX/x5OhC3OZJqW/w+8GOtCmJPBquYgMWgz0rfQ==",
+      "type": "package",
+      "path": "idisposableanalyzers/4.0.8",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/IDisposableAnalyzers.dll",
+        "idisposableanalyzers.4.0.8.nupkg.sha512",
+        "idisposableanalyzers.nuspec",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
     "Microsoft.Extensions.DependencyInjection/10.0.12": {
       "sha512": "lXyK2O5GoYvfxW8eCFcD16JFbcoSTM1sJkAM0UHS1jZyl9NYMW64Tqm6OQFT0IDBjZi+xHt95/Zg+nxZhGFhZg==",
       "type": "package",
@@ -55,6 +73,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0-windows": [
+      "IDisposableAnalyzers >= 4.0.8",
       "Microsoft.Extensions.DependencyInjection >= 10.0.12"
     ]
   },
@@ -103,6 +122,12 @@
         "framework": "net10.0-windows7.0",
         "targetAlias": "net10.0-windows",
         "dependencies": {
+          "IDisposableAnalyzers": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[4.0.8, )"
+          },
           "Microsoft.Extensions.DependencyInjection": {
             "target": "Package",
             "version": "[10.0.12, )"
