@@ -9,12 +9,13 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://gemini.google.com/*",
-    "https://chatgpt.com/*",
-    "https://claude.ai/*"
+    "https://gemini.google.com/*"
   ],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "background": {
-    "service_worker": "src/background/background.js",
+    "service_worker": "backgroundContent.js",
     "type": "module"
   },
   "content_scripts": [
@@ -23,9 +24,8 @@
         "https://gemini.google.com/*"
       ],
       "js": [
-        "src/content/content.js"
-      ],
-      "type": "module"
+        "dist/content.bundle.js"
+      ]
     }
   ]
 }
