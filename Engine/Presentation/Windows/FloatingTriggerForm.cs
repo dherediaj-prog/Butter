@@ -10,7 +10,6 @@ public class FloatingTriggerForm : Form
 {
     private const int WM_MOUSEACTIVATE = 0x0021;
     private const int MA_NOACTIVATE = 3;
-
     private const int WS_EX_TOPMOST = 0x00000008;
     private const int WS_EX_TOOLWINDOW = 0x00000080;
     private const int WS_EX_NOACTIVATE = 0x08000000;
@@ -18,6 +17,7 @@ public class FloatingTriggerForm : Form
     private readonly PanelTrigger _triggerModel;
     private readonly SendPromptCommand _sendPromptCommand;
     private readonly SendImageCommand _sendImageCommand;
+    private readonly ProviderSelectionControl _providerControl; // UI Incrustada
 
     private readonly Panel _pnlDragHandle;
     private readonly Button _btnMainAction;
@@ -27,11 +27,13 @@ public class FloatingTriggerForm : Form
     public FloatingTriggerForm(
         PanelTrigger triggerModel,
         SendPromptCommand sendPromptCommand,
-        SendImageCommand sendImageCommand)
+        SendImageCommand sendImageCommand,
+        ProviderSelectionControl providerControl) // Se inyecta automáticamente por DI
     {
         _triggerModel = triggerModel ?? throw new ArgumentNullException(nameof(triggerModel));
         _sendPromptCommand = sendPromptCommand ?? throw new ArgumentNullException(nameof(sendPromptCommand));
         _sendImageCommand = sendImageCommand ?? throw new ArgumentNullException(nameof(sendImageCommand));
+        _providerControl = providerControl ?? throw new ArgumentNullException(nameof(providerControl));
 
         FormBorderStyle = FormBorderStyle.None;
         ShowInTaskbar = false;
@@ -51,24 +53,15 @@ public class FloatingTriggerForm : Form
             Cursor = Cursors.SizeAll,
             BackColor = _triggerModel.GripBackColor
         };
-        _pnlDragHandle.Paint += (s, e) => e.Graphics.DrawGripTexture(_triggerModel.GripDotColor);
-        _pnlDragHandle.MouseDown += (s, e) =>
-        {
-            if (e.Button == MouseButtons.Left) _triggerModel.BeginDrag(e.Location);
-        };
-        _pnlDragHandle.MouseMove += (s, e) =>
-        {
-            if (_triggerModel.IsDragging) _triggerModel.DragTo(PointToScreen(e.Location));
-        };
-        _pnlDragHandle.MouseUp += (s, e) =>
-        {
-            if (e.Button == MouseButtons.Left) _triggerModel.EndDrag();
-        };
+        _pnlDragHandle.Paint += (_, e) => e.Graphics.DrawGripTexture(_triggerModel.GripDotColor);
+        _pnlDragHandle.MouseDown += (_, e) => { if (e.Button == MouseButtons.Left) _triggerModel.BeginDrag(e.Location); };
+        _pnlDragHandle.MouseMove += (_, e) => { if (_triggerModel.IsDragging) _triggerModel.DragTo(PointToScreen(e.Location)); };
+        _pnlDragHandle.MouseUp += (_, e) => { if (e.Button == MouseButtons.Left) _triggerModel.EndDrag(); };
 
-        // 2. Menú Desplegable con Comandos Convertidos
+        // 2. Menú Desplegable (Que ahora aloja a la UI de proveedores)
         _contextMenu = BuildContextMenu();
 
-        // 3. Botón de Acción Principal (Vinculado a SendPromptCommand)
+        // 3. Botón de Acción Principal
         _btnMainAction = new Button
         {
             Dock = DockStyle.Fill,
@@ -77,10 +70,7 @@ public class FloatingTriggerForm : Form
         };
         _btnMainAction.FlatAppearance.BorderSize = 0;
         _btnMainAction.FlatAppearance.MouseOverBackColor = _triggerModel.ButtonHoverColor;
-        _btnMainAction.Paint += (s, e) =>
-            e.Graphics.DrawIcon(FoodIcons.Croissant, _btnMainAction.ClientRectangle, _triggerModel.ButtonForeColor);
-
-        // Enlace directo del botón principal al comando
+        _btnMainAction.Paint += (_, e) => e.Graphics.DrawIcon(FoodIcons.Croissant, _btnMainAction.ClientRectangle, _triggerModel.ButtonForeColor);
         _sendPromptCommand.BindTo(_btnMainAction, parameterSupplier: () => "Procesa la selección actual");
 
         // 4. Botón Dropdown
@@ -96,7 +86,7 @@ public class FloatingTriggerForm : Form
         };
         _btnDropdown.FlatAppearance.BorderSize = 0;
         _btnDropdown.FlatAppearance.MouseOverBackColor = _triggerModel.DropdownHoverColor;
-        _btnDropdown.Click += (s, e) =>
+        _btnDropdown.Click += (_, _) =>
         {
             _contextMenu.Show(_btnDropdown, new Point(0, _btnDropdown.Height));
             _triggerModel.Open();
@@ -128,7 +118,6 @@ public class FloatingTriggerForm : Form
             m.Result = (IntPtr)MA_NOACTIVATE;
             return;
         }
-
         base.WndProc(ref m);
     }
 
@@ -142,12 +131,25 @@ public class FloatingTriggerForm : Form
             Font = _triggerModel.Font
         };
 
-        // Transformación declarativa de Comandos a Ítems de Menú
+        // Comandos regulares
         menu.Items.Add(_sendPromptCommand.ToMenuItem(parameterSupplier: () => "Procesa la selección actual"));
         menu.Items.Add(_sendImageCommand.ToMenuItem());
+        
+        menu.Items.Add(new ToolStripSeparator());
+        
+        // --- INCRUSTACIÓN DEL USER CONTROL MEDIANTE HOST ---
+        var host = new ToolStripControlHost(_providerControl)
+        {
+            Margin = Padding.Empty,
+            Padding = Padding.Empty,
+            AutoSize = false,
+            Size = _providerControl.Size
+        };
+        menu.Items.Add(host);
+        // ---------------------------------------------------
 
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("❌ Ocultar Botón", null, (s, e) =>
+        menu.Items.Add("❌ Ocultar Botón", null, (_, _) =>
         {
             Hide();
             _triggerModel.Hide();
@@ -176,11 +178,8 @@ public class FloatingTriggerForm : Form
     {
         if (IsDisposed || !IsHandleCreated) return;
         if (InvokeRequired)
-        {
             Invoke(action);
-            return;
-        }
-
-        action();
+        else
+            action();
     }
 }

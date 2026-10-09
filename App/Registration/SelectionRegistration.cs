@@ -10,6 +10,7 @@ public static class SelectionRegistration
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        services.AddTransient<ProviderSelectionControl>();
         services.AddSingleton<Selection>();
         services.AddTransient<SelectionForm>();
 
