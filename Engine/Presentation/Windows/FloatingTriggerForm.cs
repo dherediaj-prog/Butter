@@ -1,4 +1,6 @@
 using Engine.Assets.Icons;
+using Engine.Entities.Commands;
+using Engine.Entities.Commands.Extensions;
 using Engine.Entities.PanelTriggers;
 using Engine.Services.IconRenderer;
 
@@ -14,18 +16,23 @@ public class FloatingTriggerForm : Form
     private const int WS_EX_NOACTIVATE = 0x08000000;
 
     private readonly PanelTrigger _triggerModel;
+    private readonly SendPromptCommand _sendPromptCommand;
+    private readonly SendImageCommand _sendImageCommand;
+
     private readonly Panel _pnlDragHandle;
     private readonly Button _btnMainAction;
     private readonly Button _btnDropdown;
     private readonly ContextMenuStrip _contextMenu;
 
-    public event Action<string>? OnActionExecuted;
-
-    public FloatingTriggerForm(PanelTrigger triggerModel)
+    public FloatingTriggerForm(
+        PanelTrigger triggerModel,
+        SendPromptCommand sendPromptCommand,
+        SendImageCommand sendImageCommand)
     {
         _triggerModel = triggerModel ?? throw new ArgumentNullException(nameof(triggerModel));
+        _sendPromptCommand = sendPromptCommand ?? throw new ArgumentNullException(nameof(sendPromptCommand));
+        _sendImageCommand = sendImageCommand ?? throw new ArgumentNullException(nameof(sendImageCommand));
 
-        // Configuración de la Ventana
         FormBorderStyle = FormBorderStyle.None;
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.Manual;
@@ -58,10 +65,10 @@ public class FloatingTriggerForm : Form
             if (e.Button == MouseButtons.Left) _triggerModel.EndDrag();
         };
 
-        // 2. Menú Desplegable
+        // 2. Menú Desplegable con Comandos Convertidos
         _contextMenu = BuildContextMenu();
 
-        // 3. Botón de Acción Principal (Renderizado en una sola línea)
+        // 3. Botón de Acción Principal (Vinculado a SendPromptCommand)
         _btnMainAction = new Button
         {
             Dock = DockStyle.Fill,
@@ -72,7 +79,9 @@ public class FloatingTriggerForm : Form
         _btnMainAction.FlatAppearance.MouseOverBackColor = _triggerModel.ButtonHoverColor;
         _btnMainAction.Paint += (s, e) =>
             e.Graphics.DrawIcon(FoodIcons.Croissant, _btnMainAction.ClientRectangle, _triggerModel.ButtonForeColor);
-        _btnMainAction.Click += (s, e) => ExecuteAction("SEND_PROMPT");
+
+        // Enlace directo del botón principal al comando
+        _sendPromptCommand.BindTo(_btnMainAction, parameterSupplier: () => "Procesa la selección actual");
 
         // 4. Botón Dropdown
         _btnDropdown = new Button
@@ -123,25 +132,20 @@ public class FloatingTriggerForm : Form
         base.WndProc(ref m);
     }
 
-    public void ExecuteAction(string actionKey)
-    {
-        _triggerModel.Click();
-        OnActionExecuted?.Invoke(actionKey);
-    }
-
     private ContextMenuStrip BuildContextMenu()
     {
         var menu = new ContextMenuStrip
         {
-            ShowImageMargin = false,
+            ShowImageMargin = true,
             BackColor = _triggerModel.MenuBackColor,
             ForeColor = _triggerModel.MenuForeColor,
             Font = _triggerModel.Font
         };
 
-        menu.Items.Add("💬 Enviar Prompt", null, (s, e) => ExecuteAction("SEND_PROMPT"));
-        menu.Items.Add("📷 Capturar Pantalla", null, (s, e) => ExecuteAction("CAPTURE_SCREEN"));
-        menu.Items.Add("🚫 Cancelar Operación", null, (s, e) => ExecuteAction("CANCEL"));
+        // Transformación declarativa de Comandos a Ítems de Menú
+        menu.Items.Add(_sendPromptCommand.ToMenuItem(parameterSupplier: () => "Procesa la selección actual"));
+        menu.Items.Add(_sendImageCommand.ToMenuItem());
+
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("❌ Ocultar Botón", null, (s, e) =>
         {
