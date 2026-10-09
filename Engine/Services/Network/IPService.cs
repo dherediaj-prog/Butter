@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace Engine.Helpers;
+namespace Engine.Services.Network;
 
-public static class NetworkHelper
+public static class IPService
 {
     public static string GetLocalIPAddress()
     {

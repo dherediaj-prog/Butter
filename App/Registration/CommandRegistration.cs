@@ -15,7 +15,6 @@ public static class CommandRegistration
 
         // Comandos de IA
         services.AddSingleton<SendPromptCommand>();
-        services.AddSingleton<SendImageCommand>();
 
         return services;
     }

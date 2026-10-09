@@ -16,7 +16,7 @@ public static class SelectionBootstrap
         var responseDisplay = provider.GetRequiredService<ResponseDisplay>();
         var panelTrigger = provider.GetRequiredService<PanelTrigger>();
         var captureService = provider.GetRequiredService<IScreenCaptureService>();
-        var sendImageCommand = provider.GetRequiredService<SendImageCommand>();
+        var sendPromptCommand = provider.GetRequiredService<SendPromptCommand>();
 
         selection.SelectionRequested += () =>
         {
@@ -32,7 +32,7 @@ public static class SelectionBootstrap
 
                 // Ubicación en la esquina superior derecha del área seleccionada
                 int triggerX = bounds.Right - panelTrigger.Size.Width;
-                int triggerY = bounds.Top - panelTrigger.Size.Height - 6;
+                int triggerY = bounds.Top - (panelTrigger.Size.Height / 2);
 
                 panelTrigger.SetPosition(triggerX, triggerY);
                 panelTrigger.Show();
@@ -40,7 +40,7 @@ public static class SelectionBootstrap
                 var imageBytes = captureService.CaptureRegion(bounds);
                 if (imageBytes.Length > 0)
                 {
-                    await sendImageCommand.ExecuteAsync(new SendImageArgs(imageBytes));
+                    await sendPromptCommand.ExecuteAsync(new SendPromptArgs(ImageBytes: imageBytes));
                 }
             }
             catch (Exception exception)

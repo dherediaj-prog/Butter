@@ -1,6 +1,6 @@
 using Engine.Entities.ResponseDisplays;
-using Engine.Helpers;
 using Engine.Presentation.Windows;
+using Engine.Services.Network;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App.Bootstrapping;
@@ -12,7 +12,7 @@ public static class OverlayBootstrap
         var overlay = provider.GetRequiredService<ResponseDisplay>();
         var passiveOverlay = provider.GetRequiredService<ResponseDisplayForm>();
 
-        var localIp = NetworkHelper.GetLocalIPAddress();
+        var localIp = IPService.GetLocalIPAddress();
         overlay.UpdateResponseText(
             "=== CONFIGURACIÓN DE CONEXIÓN ===\n" +
             "1. Abre Kiwi Browser / Firefox (Android) y entra a Gemini con tu cuenta activa.\n" +

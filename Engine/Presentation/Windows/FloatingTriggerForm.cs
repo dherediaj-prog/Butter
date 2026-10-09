@@ -16,8 +16,7 @@ public class FloatingTriggerForm : Form
 
     private readonly PanelTrigger _triggerModel;
     private readonly SendPromptCommand _sendPromptCommand;
-    private readonly SendImageCommand _sendImageCommand;
-    private readonly ProviderSelectionControl _providerControl; // UI Incrustada
+    private readonly ProviderSelectionControl _providerControl;
 
     private readonly Panel _pnlDragHandle;
     private readonly Button _btnMainAction;
@@ -27,12 +26,10 @@ public class FloatingTriggerForm : Form
     public FloatingTriggerForm(
         PanelTrigger triggerModel,
         SendPromptCommand sendPromptCommand,
-        SendImageCommand sendImageCommand,
-        ProviderSelectionControl providerControl) // Se inyecta automáticamente por DI
+        ProviderSelectionControl providerControl)
     {
         _triggerModel = triggerModel ?? throw new ArgumentNullException(nameof(triggerModel));
         _sendPromptCommand = sendPromptCommand ?? throw new ArgumentNullException(nameof(sendPromptCommand));
-        _sendImageCommand = sendImageCommand ?? throw new ArgumentNullException(nameof(sendImageCommand));
         _providerControl = providerControl ?? throw new ArgumentNullException(nameof(providerControl));
 
         FormBorderStyle = FormBorderStyle.None;
@@ -58,7 +55,7 @@ public class FloatingTriggerForm : Form
         _pnlDragHandle.MouseMove += (_, e) => { if (_triggerModel.IsDragging) _triggerModel.DragTo(PointToScreen(e.Location)); };
         _pnlDragHandle.MouseUp += (_, e) => { if (e.Button == MouseButtons.Left) _triggerModel.EndDrag(); };
 
-        // 2. Menú Desplegable (Que ahora aloja a la UI de proveedores)
+        // 2. Menú Desplegable (Alojamiento de UI de proveedores)
         _contextMenu = BuildContextMenu();
 
         // 3. Botón de Acción Principal
@@ -71,7 +68,7 @@ public class FloatingTriggerForm : Form
         _btnMainAction.FlatAppearance.BorderSize = 0;
         _btnMainAction.FlatAppearance.MouseOverBackColor = _triggerModel.ButtonHoverColor;
         _btnMainAction.Paint += (_, e) => e.Graphics.DrawIcon(FoodIcons.Croissant, _btnMainAction.ClientRectangle, _triggerModel.ButtonForeColor);
-        _sendPromptCommand.BindTo(_btnMainAction, parameterSupplier: () => "Procesa la selección actual");
+        _sendPromptCommand.BindTo(_btnMainAction, parameterSupplier: () => new SendPromptArgs(Prompt: "Procesa la selección actual"));
 
         // 4. Botón Dropdown
         _btnDropdown = new Button
@@ -131,9 +128,8 @@ public class FloatingTriggerForm : Form
             Font = _triggerModel.Font
         };
 
-        // Comandos regulares
-        menu.Items.Add(_sendPromptCommand.ToMenuItem(parameterSupplier: () => "Procesa la selección actual"));
-        menu.Items.Add(_sendImageCommand.ToMenuItem());
+        // Comando de envío unificado (Texto e/o Imagen)
+        menu.Items.Add(_sendPromptCommand.ToMenuItem(parameterSupplier: () => new SendPromptArgs(Prompt: "Procesa la selección actual")));
         
         menu.Items.Add(new ToolStripSeparator());
         

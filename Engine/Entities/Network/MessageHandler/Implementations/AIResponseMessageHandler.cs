@@ -32,7 +32,7 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
                 break;
 
             case ProviderStatus.Completed:
-                var payload = envelope.GetPayload<AIResponsePayload>();
+                var payload = envelope.GetPayload<ResponsePayload>();
                 string textResult = payload?.Text ?? string.Empty;
 
                 _responseDisplay.UpdateResponseText(string.IsNullOrWhiteSpace(textResult) ? "͡° ͜ʖ ͡°" : textResult);
@@ -40,7 +40,8 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
                 break;
 
             case ProviderStatus.Failed:
-                string errorMessage = envelope.Error?.Message ?? "Ocurrió un error inesperado al procesar la respuesta.";
+                string errorMessage =
+                    envelope.Error?.Message ?? "Ocurrió un error inesperado al procesar la respuesta.";
                 _responseDisplay.UpdateResponseText($"❌ Error: {errorMessage}");
                 _responseDisplay.SetVisibility(true);
                 break;
