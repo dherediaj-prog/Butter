@@ -1,4 +1,4 @@
-import { IClientMessageHandler } from '../Interfaces/IClientMessageHandler';
+import { IClientMessageHandler } from '../Interfaces/IClientMessageHandler.js';
 
 export class CancelMessageHandler extends IClientMessageHandler {
     /**

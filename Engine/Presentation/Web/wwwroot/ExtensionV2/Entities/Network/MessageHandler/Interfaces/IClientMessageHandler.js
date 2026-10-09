@@ -1,6 +1,5 @@
-import {ProviderEnvelope} from '../../../IAProviders/DTO/ProviderEnvelope';
-import {WebSocketClient} from '../../WebSocketClients/WebSocketClient';
-import {IIAProvider} from '../../../IAProviders/Interfaces/IIAProvider';
+import {ProviderEnvelope} from '../../../IAProviders/DTO/ProviderEnvelope.js';
+import {WebSocketClient} from '../../WebSocketClients/WebSocketClient.js';
 
 /**
  * Contrato base para los manejadores de mensajes del lado del cliente.

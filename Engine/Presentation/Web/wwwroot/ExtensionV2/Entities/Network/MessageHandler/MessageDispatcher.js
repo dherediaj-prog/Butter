@@ -1,5 +1,5 @@
-import { ProviderEnvelope } from '../../IAProviders/DTO/ProviderEnvelope';
-import { IClientMessageHandler } from './Interfaces/IClientMessageHandler';
+import { ProviderEnvelope } from '../../IAProviders/DTO/ProviderEnvelope.js';
+import { IClientMessageHandler } from './Interfaces/IClientMessageHandler.js';
 
 /**
  * Despachador de mensajes del Content Script.

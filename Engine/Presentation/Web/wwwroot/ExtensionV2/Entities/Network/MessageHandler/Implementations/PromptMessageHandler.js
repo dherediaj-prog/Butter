@@ -1,6 +1,6 @@
-import { IClientMessageHandler } from '../Interfaces/IClientMessageHandler';
-import { PromptPayload } from '../Payloads/PromptPayload';
-import { ResponsePayload } from '../Payloads/ResponsePayload';
+import { IClientMessageHandler } from '../Interfaces/IClientMessageHandler.js';
+import { PromptPayload } from '../Payloads/PromptPayload.js';
+import { ResponsePayload } from '../Payloads/ResponsePayload.js';
 
 export class PromptMessageHandler extends IClientMessageHandler {
     /**

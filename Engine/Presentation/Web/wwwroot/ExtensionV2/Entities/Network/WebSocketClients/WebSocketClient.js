@@ -1,4 +1,4 @@
-import { ProviderEnvelope } from '../../IAProviders/DTO/ProviderEnvelope';
+import { ProviderEnvelope } from '../../IAProviders/DTO/ProviderEnvelope.js';
 
 /**
  * Cliente WebSocket resiliente enfocado exclusivamente en el protocolo ProviderEnvelope.

@@ -1,4 +1,4 @@
-import {IIAProvider} from './Interfaces/IIAProvider';
+import {IIAProvider} from './Interfaces/IIAProvider.js';
 
 /**
  * @implements {IIAProvider}

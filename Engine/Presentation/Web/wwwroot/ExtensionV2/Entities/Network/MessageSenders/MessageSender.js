@@ -1,4 +1,4 @@
-import {ProviderEnvelope} from '../../IAProviders/DTO/ProviderEnvelope';
+import {ProviderEnvelope} from '../../IAProviders/DTO/ProviderEnvelope.js';
 
 /**
  * Emisor saliente de mensajes desde el Content Script hacia el Service Worker (Background).
