@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Engine.Entities.Overlays;
+using Engine.Entities.ResponseDisplays;
 using Engine.Entities.Selections;
 
 namespace Engine.Presentation.Windows;
@@ -13,7 +13,7 @@ public class NativeHotkeyListener : Form
     private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
     private readonly Selection _selection;
-    private readonly Overlay _overlay;
+    private readonly ResponseDisplay _responseDisplay;
 
     private const int TRIGGER_HOTKEY_ID = 9000;
     private const int EXIT_HOTKEY_ID = 9001;
@@ -24,10 +24,10 @@ public class NativeHotkeyListener : Form
     private const uint VK_F9 = 0x78;
     private const uint MOD_SHIFT = 0x0004;
 
-    public NativeHotkeyListener(Selection selection, Overlay overlay)
+    public NativeHotkeyListener(Selection selection, ResponseDisplay responseDisplay)
     {
         _selection = selection ?? throw new ArgumentNullException(nameof(selection));
-        _overlay = overlay ?? throw new ArgumentNullException(nameof(overlay));
+        _responseDisplay = responseDisplay ?? throw new ArgumentNullException(nameof(responseDisplay));
 
         FormBorderStyle = FormBorderStyle.None;
         ShowInTaskbar = false;
@@ -41,7 +41,7 @@ public class NativeHotkeyListener : Form
         // F8 -> Iniciar Selección y Captura
         RegisterHotKey(Handle, TRIGGER_HOTKEY_ID, 0x0000, VK_F8);
 
-        // F9 -> Mover Posición del Overlay al Cursor (Imperceptible en 0ms)
+        // F9 -> Mover Posición del ResponseDisplay al Cursor (Imperceptible en 0ms)
         RegisterHotKey(Handle, POSITION_HOTKEY_ID, 0x0000, VK_F9);
 
         // Shift + F8 -> Cierre Total del Programa
@@ -60,8 +60,8 @@ public class NativeHotkeyListener : Form
             }
             else if (hotkeyId == POSITION_HOTKEY_ID)
             {
-                // Posiciona el Overlay instantáneamente donde esté apuntando el ratón
-                _overlay.SetPosition(Cursor.Position.X, Cursor.Position.Y);
+                // Posiciona el ResponseDisplay instantáneamente donde esté apuntando el ratón
+                _responseDisplay.SetPosition(Cursor.Position.X, Cursor.Position.Y);
             }
             else if (hotkeyId == EXIT_HOTKEY_ID)
             {

@@ -5,20 +5,20 @@ using Engine.Entities.Network.Provider;
 using Engine.Entities.Network.Provider.DTO;
 using Engine.Entities.Network.Provider.Enums;
 using Engine.Entities.Network.Provider.Extensions;
-using Engine.Entities.Overlays;
+using Engine.Entities.ResponseDisplays;
 
 namespace Engine.Entities.Network.MessageHandler.Implementations;
 
 public class AIResponseMessageHandler : IWebSocketMessageHandler
 {
-    private readonly Overlay _overlay;
+    private readonly ResponseDisplay _responseDisplay;
 
     public string Action => "AI_RESPONSE";
 
-    public AIResponseMessageHandler(Overlay overlay)
+    public AIResponseMessageHandler(ResponseDisplay responseDisplay)
     {
-        ArgumentNullException.ThrowIfNull(overlay);
-        _overlay = overlay;
+        ArgumentNullException.ThrowIfNull(responseDisplay);
+        _responseDisplay = responseDisplay;
     }
 
     public Task HandleAsync(AIProvider client, ProviderEnvelope<JsonElement> envelope, CancellationToken ct = default)
@@ -27,23 +27,22 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
         {
             case ProviderStatus.Loading:
             case ProviderStatus.Processing:
-                _overlay.UpdateResponseText("⏳ Procesando consulta...");
-                _overlay.SetVisibility(true);
+                _responseDisplay.UpdateResponseText("⏳ Procesando consulta...");
+                _responseDisplay.SetVisibility(true);
                 break;
 
             case ProviderStatus.Completed:
                 var payload = envelope.GetPayload<AIResponsePayload>();
                 string textResult = payload?.Text ?? string.Empty;
 
-                _overlay.UpdateResponseText(string.IsNullOrWhiteSpace(textResult) ? "͡° ͜ʖ ͡°" : textResult);
-                _overlay.SetVisibility(true);
+                _responseDisplay.UpdateResponseText(string.IsNullOrWhiteSpace(textResult) ? "͡° ͜ʖ ͡°" : textResult);
+                _responseDisplay.SetVisibility(true);
                 break;
 
             case ProviderStatus.Failed:
-                string errorMessage =
-                    envelope.Error?.Message ?? "Ocurrió un error inesperado al procesar la respuesta.";
-                _overlay.UpdateResponseText($"❌ Error: {errorMessage}");
-                _overlay.SetVisibility(true);
+                string errorMessage = envelope.Error?.Message ?? "Ocurrió un error inesperado al procesar la respuesta.";
+                _responseDisplay.UpdateResponseText($"❌ Error: {errorMessage}");
+                _responseDisplay.SetVisibility(true);
                 break;
         }
 

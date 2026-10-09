@@ -1,7 +1,6 @@
 using Engine.Entities.Commands;
-using Engine.Entities.Overlays;
 using Engine.Entities.PanelTriggers;
-using Engine.Entities.PanelTriggers.Enums;
+using Engine.Entities.ResponseDisplays;
 using Engine.Entities.Selections;
 using Engine.Presentation.Windows;
 using Engine.Services.ScreenCapture;
@@ -14,7 +13,7 @@ public static class SelectionBootstrap
     public static void BootstrapSelection(this IServiceProvider provider)
     {
         var selection = provider.GetRequiredService<Selection>();
-        var overlay = provider.GetRequiredService<Overlay>();
+        var responseDisplay = provider.GetRequiredService<ResponseDisplay>();
         var panelTrigger = provider.GetRequiredService<PanelTrigger>();
         var captureService = provider.GetRequiredService<IScreenCaptureService>();
         var sendImageCommand = provider.GetRequiredService<SendImageCommand>();
@@ -35,8 +34,13 @@ public static class SelectionBootstrap
         {
             try
             {
-                overlay.SetPosition(bounds.X, bounds.Y);
-                panelTrigger.AnchorTo(bounds, AnchorAlignment.TopRight);
+                responseDisplay.SetPosition(bounds.X, bounds.Y);
+
+                // Ubicación en la esquina superior derecha del área seleccionada
+                int triggerX = bounds.Right - panelTrigger.Size.Width;
+                int triggerY = bounds.Top - panelTrigger.Size.Height - 6;
+
+                panelTrigger.SetPosition(triggerX, triggerY);
                 panelTrigger.Show();
 
                 var imageBytes = captureService.CaptureRegion(bounds);

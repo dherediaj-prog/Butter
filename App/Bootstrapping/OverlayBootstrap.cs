@@ -1,4 +1,4 @@
-using Engine.Entities.Overlays;
+using Engine.Entities.ResponseDisplays;
 using Engine.Helpers;
 using Engine.Presentation.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,8 +9,8 @@ public static class OverlayBootstrap
 {
     public static void BootstrapOverlay(this IServiceProvider provider, int serverPort)
     {
-        var overlay = provider.GetRequiredService<Overlay>();
-        var passiveOverlay = provider.GetRequiredService<PassiveOverlayForm>();
+        var overlay = provider.GetRequiredService<ResponseDisplay>();
+        var passiveOverlay = provider.GetRequiredService<ResponseDisplayForm>();
 
         var localIp = NetworkHelper.GetLocalIPAddress();
         overlay.UpdateResponseText(

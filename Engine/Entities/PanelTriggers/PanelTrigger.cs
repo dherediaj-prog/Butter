@@ -1,19 +1,38 @@
-using Engine.Entities.PanelTriggers.Enums;
+using System.Drawing;
 
 namespace Engine.Entities.PanelTriggers;
 
 public class PanelTrigger
 {
     private Point _position = new(100, 100);
-    private Size _size = new(32, 32);
+    private Size _size = new(180, 36);
     private bool _isVisible;
     private bool _isOpen;
 
-    // --- Eventos Livianos (Mismo patrón que Overlay y Selection) ---
+    // --- Estado de Arrastre (Drag State) ---
+    private bool _isDragging;
+    private Point _dragOffset;
+
+    // --- Estilos Visuales de la Entidad ---
+    public Color BackColor { get; set; } = Color.FromArgb(32, 33, 36);
+    public Color GripBackColor { get; set; } = Color.FromArgb(45, 48, 53);
+    public Color GripDotColor { get; set; } = Color.FromArgb(120, 130, 140);
+    public Color ButtonForeColor { get; set; } = Color.White;
+    public Color ButtonHoverColor { get; set; } = Color.FromArgb(55, 58, 64);
+    public Color DropdownForeColor { get; set; } = Color.Gainsboro;
+    public Color DropdownHoverColor { get; set; } = Color.FromArgb(65, 68, 75);
+    public Color MenuBackColor { get; set; } = Color.FromArgb(40, 42, 46);
+    public Color MenuForeColor { get; set; } = Color.White;
+
+    public Font Font { get; set; } = new("Segoe UI", 9f, FontStyle.Bold);
+    public Font DropdownFont { get; set; } = new("Segoe UI", 7f, FontStyle.Regular);
+
+    // --- Eventos ---
     public event Action<Point>? PositionChanged;
     public event Action<Size>? SizeChanged;
     public event Action<bool>? VisibilityChanged;
-    public event Action<bool>? StateChanged; // Indica si el menú/panel objetivo se desplegó u ocultó
+    public event Action<bool>? StateChanged;
+    public event Action? StyleChanged;
     public event Action? Clicked;
     public event Action? Changed;
 
@@ -22,13 +41,11 @@ public class PanelTrigger
     public Size Size => _size;
     public Rectangle Bounds => new(_position, _size);
     public bool IsVisible => _isVisible;
-
-    /// <summary>
-    /// Indica si el panel o menú controlado por este trigger está abierto/activo.
-    /// </summary>
     public bool IsOpen => _isOpen;
+    public bool IsDragging => _isDragging;
+    public Point DragOffset => _dragOffset;
 
-    // --- Posicionamiento y Dimensión ---
+    // --- Posicionamiento y Arrastre ---
 
     public void SetPosition(int x, int y) => SetPosition(new Point(x, y));
 
@@ -40,8 +57,6 @@ public class PanelTrigger
         Changed?.Invoke();
     }
 
-    public void SetSize(int width, int height) => SetSize(new Size(width, height));
-
     public void SetSize(Size size)
     {
         if (_size == size) return;
@@ -50,42 +65,37 @@ public class PanelTrigger
         Changed?.Invoke();
     }
 
-    /// <summary>
-    /// Ancla automáticamente la posición del trigger respecto a un área (ej: un Selection.Bounds o la esquina de la pantalla).
-    /// </summary>
-    public void AnchorTo(Rectangle targetArea, AnchorAlignment alignment = AnchorAlignment.TopRight, int offset = 6)
+    public void BeginDrag(Point mouseLocation)
     {
-        if (targetArea.IsEmpty) return;
-
-        int x = alignment switch
-        {
-            AnchorAlignment.TopRight or AnchorAlignment.BottomRight => targetArea.Right - _size.Width + offset,
-            AnchorAlignment.TopLeft or AnchorAlignment.BottomLeft => targetArea.Left - offset,
-            AnchorAlignment.TopCenter or AnchorAlignment.BottomCenter => targetArea.Left +
-                                                                         (targetArea.Width - _size.Width) / 2,
-            _ => targetArea.Right
-        };
-
-        int y = alignment switch
-        {
-            AnchorAlignment.TopRight or AnchorAlignment.TopLeft or AnchorAlignment.TopCenter => targetArea.Top -
-                _size.Height - offset,
-            AnchorAlignment.BottomRight or AnchorAlignment.BottomLeft or AnchorAlignment.BottomCenter => targetArea
-                .Bottom + offset,
-            _ => targetArea.Top
-        };
-
-        SetPosition(x, y);
+        _isDragging = true;
+        _dragOffset = mouseLocation;
     }
 
-    // --- Visibilidad y Estado de Disparo ---
+    public void DragTo(Point screenMousePosition)
+    {
+        if (!_isDragging) return;
+
+        var targetLocation = new Point(
+            screenMousePosition.X - _dragOffset.X,
+            screenMousePosition.Y - _dragOffset.Y
+        );
+
+        SetPosition(targetLocation);
+    }
+
+    public void EndDrag()
+    {
+        _isDragging = false;
+        _dragOffset = Point.Empty;
+    }
+
+    // --- Visibilidad y Estado ---
 
     public void SetVisibility(bool visible)
     {
         if (_isVisible == visible) return;
         _isVisible = visible;
 
-        // Si el trigger se oculta, se cierra automáticamente el menú/panel abierto
         if (!_isVisible && _isOpen)
         {
             _isOpen = false;
@@ -123,10 +133,17 @@ public class PanelTrigger
         Toggle();
     }
 
+    public void NotifyStyleChanged()
+    {
+        StyleChanged?.Invoke();
+        Changed?.Invoke();
+    }
+
     public void Reset()
     {
         _isVisible = false;
         _isOpen = false;
+        _isDragging = false;
         Changed?.Invoke();
     }
 }

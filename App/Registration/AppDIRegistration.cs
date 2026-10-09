@@ -12,7 +12,7 @@ public static class AppDIRegistration
 
         // Módulos agrupados por dominio
         services.AddPanelTriggers();
-        services.AddOverlayServices();
+        services.AddResponseDisplayServices();
         services.AddSelectionServices();
         services.AddHotkeyServices();
         services.AddScreenCaptureServices();
