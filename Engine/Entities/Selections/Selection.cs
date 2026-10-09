@@ -10,12 +10,7 @@ public class Selection
 
     public Rectangle Bounds => CalculateBounds(StartPoint, CurrentPoint);
 
-    // --- Propiedades de Estilo y Transparencia de la Entidad ---
-
-    /// <summary>
-    /// Color clave que el Form utiliza para recortar la transparencia nativa en WinForms.
-    /// </summary>
-    public Color TransparentColor { get; set; } = Color.Magenta;
+    // --- Propiedades de Estilo de la Selección ---
 
     /// <summary>
     /// Color del borde del rectángulo de selección.
@@ -36,11 +31,6 @@ public class Selection
     /// Estilo de la línea del borde (Sólido, Discontinuo, etc.).
     /// </summary>
     public DashStyle BorderStyle { get; set; } = DashStyle.Solid;
-
-    /// <summary>
-    /// Color de fondo para toda la pantalla. Por defecto es transparente (Color.Transparent).
-    /// </summary>
-    public Color OverlayColor { get; set; } = Color.Transparent;
 
     // --- Eventos ---
     public event Action? Changed;

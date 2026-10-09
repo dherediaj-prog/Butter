@@ -16,6 +16,7 @@ public class SelectionForm : Form
 
     private const int ESC_HOTKEY_ID = 9002;
     private const int WM_HOTKEY = 0x0312;
+    private const uint VK_ESCAPE = 0x1B;
 
     private const int WM_MOUSEACTIVATE = 0x0021;
     private const int MA_NOACTIVATE = 3;
@@ -34,25 +35,11 @@ public class SelectionForm : Form
         Cursor = Cursors.Cross;
         DoubleBuffered = true;
 
-        // Carga y vinculación de estilos desde la entidad
-        ApplyDomainStyles();
-        _selection.Changed += OnSelectionStateChanged;
-    }
+        // Capa nativa casi invisible que captura eventos del ratón a nivel de DWM
+        BackColor = Color.Black;
+        Opacity = 0.05;
 
-    private void ApplyDomainStyles()
-    {
-        BackColor = _selection.TransparentColor;
-        TransparencyKey = _selection.TransparentColor;
-        Opacity = 1.0;
-    }
-
-    private void OnSelectionStateChanged()
-    {
-        if (BackColor != _selection.TransparentColor)
-        {
-            ApplyDomainStyles();
-        }
-        Invalidate();
+        _selection.Changed += Invalidate;
     }
 
     protected override CreateParams CreateParams
@@ -70,7 +57,7 @@ public class SelectionForm : Form
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        RegisterHotKey(Handle, ESC_HOTKEY_ID, 0x0000, (uint)Keys.Escape);
+        RegisterHotKey(Handle, ESC_HOTKEY_ID, 0x0000, VK_ESCAPE);
     }
 
     protected override void WndProc(ref Message m)
@@ -114,41 +101,21 @@ public class SelectionForm : Form
 
     protected override void OnPaint(PaintEventArgs e)
     {
+        if (!_selection.IsSelecting || _selection.Bounds.IsEmpty) return;
+
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        // Limpia el canvas con el color clave configurado en la entidad de dominio.
-        // Windows recorta este color transparente dejando ver el escritorio directamente.
-        g.Clear(_selection.TransparentColor);
-
-        // 1. Renderizar el overlay general si está configurado
-        if (_selection.OverlayColor != Color.Transparent && _selection.OverlayColor.A > 0)
-        {
-            using var overlayBrush = new SolidBrush(_selection.OverlayColor);
-
-            if (_selection.IsSelecting && !_selection.Bounds.IsEmpty)
-            {
-                using var region = new Region(ClientRectangle);
-                region.Exclude(_selection.Bounds);
-                g.FillRegion(overlayBrush, region);
-            }
-            else
-            {
-                g.FillRectangle(overlayBrush, ClientRectangle);
-            }
-        }
-
-        // 2. Renderizar el área de selección activa
-        if (!_selection.IsSelecting || _selection.Bounds.IsEmpty) return;
-
         var bounds = _selection.Bounds;
 
+        // Relleno interno dinámico desde la entidad
         if (_selection.FillColor.A > 0)
         {
             using var fillBrush = new SolidBrush(_selection.FillColor);
             g.FillRectangle(fillBrush, bounds);
         }
 
+        // Borde dinámico desde la entidad
         if (_selection.BorderColor.A > 0 && _selection.BorderWidth > 0)
         {
             using var borderPen = new Pen(_selection.BorderColor, _selection.BorderWidth)
@@ -162,7 +129,7 @@ public class SelectionForm : Form
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         UnregisterHotKey(Handle, ESC_HOTKEY_ID);
-        _selection.Changed -= OnSelectionStateChanged;
+        _selection.Changed -= Invalidate;
         base.OnFormClosing(e);
     }
 }
