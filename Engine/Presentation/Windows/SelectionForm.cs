@@ -32,22 +32,34 @@ public class SelectionForm : Form
         WindowState = FormWindowState.Maximized;
         TopMost = true;
         Cursor = Cursors.Cross;
-
         DoubleBuffered = true;
 
-        // Configuración para permitir transparencia completa sin perder opacidad en lo que se dibuja
-        BackColor = Color.Magenta;
-        TransparencyKey = Color.Magenta;
-        Opacity = 1.0;
+        // Carga y vinculación de estilos desde la entidad
+        ApplyDomainStyles();
+        _selection.Changed += OnSelectionStateChanged;
+    }
 
-        _selection.Changed += Invalidate;
+    private void ApplyDomainStyles()
+    {
+        BackColor = _selection.TransparentColor;
+        TransparencyKey = _selection.TransparentColor;
+        Opacity = 1.0;
+    }
+
+    private void OnSelectionStateChanged()
+    {
+        if (BackColor != _selection.TransparentColor)
+        {
+            ApplyDomainStyles();
+        }
+        Invalidate();
     }
 
     protected override CreateParams CreateParams
     {
         get
         {
-            CreateParams cp = base.CreateParams;
+            var cp = base.CreateParams;
             cp.ExStyle |= WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
             return cp;
         }
@@ -58,7 +70,6 @@ public class SelectionForm : Form
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        // Cast directo desde la enumeración Keys de WinForms
         RegisterHotKey(Handle, ESC_HOTKEY_ID, 0x0000, (uint)Keys.Escape);
     }
 
@@ -106,12 +117,15 @@ public class SelectionForm : Form
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        // 1. Renderizar el fondo de pantalla según la configuración del objeto Selection
+        // Limpia el canvas con el color clave configurado en la entidad de dominio.
+        // Windows recorta este color transparente dejando ver el escritorio directamente.
+        g.Clear(_selection.TransparentColor);
+
+        // 1. Renderizar el overlay general si está configurado
         if (_selection.OverlayColor != Color.Transparent && _selection.OverlayColor.A > 0)
         {
             using var overlayBrush = new SolidBrush(_selection.OverlayColor);
 
-            // Si hay un fondo visible y se está seleccionando, recortamos el rectángulo para dar mayor claridad
             if (_selection.IsSelecting && !_selection.Bounds.IsEmpty)
             {
                 using var region = new Region(ClientRectangle);
@@ -123,27 +137,18 @@ public class SelectionForm : Form
                 g.FillRectangle(overlayBrush, ClientRectangle);
             }
         }
-        else
-        {
-            // Fondo transparente: Relleno con Alfa=1 (diferente de TransparencyKey)
-            // para permitir capturar clics de mouse en toda la pantalla sin oscurecer la vista.
-            using var hitTestBrush = new SolidBrush(Color.FromArgb(1, 0, 0, 0));
-            g.FillRectangle(hitTestBrush, ClientRectangle);
-        }
 
         // 2. Renderizar el área de selección activa
         if (!_selection.IsSelecting || _selection.Bounds.IsEmpty) return;
 
         var bounds = _selection.Bounds;
 
-        // Relleno interno
         if (_selection.FillColor.A > 0)
         {
             using var fillBrush = new SolidBrush(_selection.FillColor);
             g.FillRectangle(fillBrush, bounds);
         }
 
-        // Borde exterior
         if (_selection.BorderColor.A > 0 && _selection.BorderWidth > 0)
         {
             using var borderPen = new Pen(_selection.BorderColor, _selection.BorderWidth)
@@ -157,7 +162,7 @@ public class SelectionForm : Form
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         UnregisterHotKey(Handle, ESC_HOTKEY_ID);
-        _selection.Changed -= Invalidate;
+        _selection.Changed -= OnSelectionStateChanged;
         base.OnFormClosing(e);
     }
 }

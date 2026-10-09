@@ -1,6 +1,5 @@
 using App.Bootstrapping;
 using App.Registration;
-using Engine.Presentation.Windows;
 using Engine.Services.Firewall;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -47,8 +46,8 @@ internal static class Program
 
         try
         {
-            // Mantenimiento del ciclo de vida WinForms a través del Listener de Hotkeys
-            Application.Run(app.Services.GetRequiredService<NativeHotkeyListener>());
+            // Bucle nativo de mensajes sin dependencia de ningún Form principal
+            Application.Run();
         }
         finally
         {

@@ -17,17 +17,11 @@ public static class SelectionBootstrap
         var panelTrigger = provider.GetRequiredService<PanelTrigger>();
         var captureService = provider.GetRequiredService<IScreenCaptureService>();
         var sendImageCommand = provider.GetRequiredService<SendImageCommand>();
-        var hotkeyListener = provider.GetRequiredService<NativeHotkeyListener>();
 
         selection.SelectionRequested += () =>
         {
-            hotkeyListener.BeginInvoke((Action)(() =>
-            {
-                if (hotkeyListener.IsDisposed || hotkeyListener.Disposing) return;
-
-                using var selectionForm = provider.GetRequiredService<SelectionForm>();
-                selectionForm.ShowDialog(hotkeyListener);
-            }));
+            using var selectionForm = provider.GetRequiredService<SelectionForm>();
+            selectionForm.ShowDialog();
         };
 
         selection.Completed += async bounds =>
@@ -52,7 +46,6 @@ public static class SelectionBootstrap
             catch (Exception exception)
             {
                 MessageBox.Show(
-                    hotkeyListener,
                     $"No se pudo capturar o enviar la selección: {exception.Message}",
                     "ButterKnife",
                     MessageBoxButtons.OK,

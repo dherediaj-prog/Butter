@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace Engine.Entities.Selections;
@@ -11,17 +10,22 @@ public class Selection
 
     public Rectangle Bounds => CalculateBounds(StartPoint, CurrentPoint);
 
-    // --- Propiedades de Estilo de la Selección ---
-    
+    // --- Propiedades de Estilo y Transparencia de la Entidad ---
+
+    /// <summary>
+    /// Color clave que el Form utiliza para recortar la transparencia nativa en WinForms.
+    /// </summary>
+    public Color TransparentColor { get; set; } = Color.Magenta;
+
     /// <summary>
     /// Color del borde del rectángulo de selección.
     /// </summary>
-    public Color BorderColor { get; set; } = Color.FromArgb(255, 0, 120, 215); // Azul acentuado brillante
+    public Color BorderColor { get; set; } = Color.FromArgb(255, 0, 120, 215);
 
     /// <summary>
     /// Color de relleno interno del área seleccionada.
     /// </summary>
-    public Color FillColor { get; set; } = Color.FromArgb(45, 0, 120, 215);    // Relleno suave y visible
+    public Color FillColor { get; set; } = Color.FromArgb(45, 0, 120, 215);
 
     /// <summary>
     /// Ancho del trazo del borde en píxeles.
@@ -35,7 +39,6 @@ public class Selection
 
     /// <summary>
     /// Color de fondo para toda la pantalla. Por defecto es transparente (Color.Transparent).
-    /// Si se desea oscurecer la pantalla se puede asignar ej: Color.FromArgb(100, 0, 0, 0).
     /// </summary>
     public Color OverlayColor { get; set; } = Color.Transparent;
 
@@ -77,6 +80,11 @@ public class Selection
     {
         IsSelecting = false;
         Cancelled?.Invoke();
+    }
+
+    public void NotifyStyleChanged()
+    {
+        Changed?.Invoke();
     }
 
     private static Rectangle CalculateBounds(Point p1, Point p2)

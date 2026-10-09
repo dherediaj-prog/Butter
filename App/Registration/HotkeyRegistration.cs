@@ -1,4 +1,4 @@
-using Engine.Presentation.Windows;
+using Engine.Services.Hotkey;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App.Registration;
@@ -9,7 +9,7 @@ public static class HotkeyRegistration
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        services.AddSingleton<NativeHotkeyListener>();
+        services.AddSingleton<HotkeyService>();
 
         return services;
     }
