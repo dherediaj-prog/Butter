@@ -3,7 +3,6 @@ using App.Registration;
 using Engine.Services.Firewall;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace App;
 
@@ -36,17 +35,17 @@ internal static class Program
 
         await using var app = builder.Build();
 
-        // Mapeo del transporte WebSocket (/ws/chat)
-        //app.MapWebSocketTransport();
+        // 1. Inicialización de red (WebSockets en /ws/chat)
+        app.BootstrapNetwork();
 
-        // Inicialización de UI y motores
+        // 2. Inicialización de UI y motores de dominio
         app.Services.BootstrapEngine(ServerPort);
 
         await app.StartAsync();
 
         try
         {
-            // Bucle nativo de mensajes sin dependencia de ningún Form principal
+            // Bucle nativo de mensajes sin dependencia de un Form principal
             Application.Run();
         }
         finally

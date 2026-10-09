@@ -6,7 +6,7 @@ public static class AppBootstrap
     {
         ArgumentNullException.ThrowIfNull(provider);
 
-        // Bootstrap modular ordenado por dominio
+        // Bootstrap modular de subsistemas WinForms / Dominios
         provider.BootstrapOverlay(serverPort);
         provider.BootstrapSelection();
         provider.BootstrapPanelTrigger();
