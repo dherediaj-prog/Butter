@@ -20,23 +20,34 @@ internal static class Program
 
         var webRootPath = Path.Combine(AppContext.BaseDirectory, "Presentation.Web", "wwwroot");
         if (!Directory.Exists(webRootPath))
-            throw new DirectoryNotFoundException($"No se encontró el contenido web: {webRootPath}");
+        {
+            Directory.CreateDirectory(webRootPath);
+        }
 
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
             ContentRootPath = AppContext.BaseDirectory,
             WebRootPath = webRootPath
         });
+
         builder.WebHost.UseUrls($"http://0.0.0.0:{ServerPort}");
-        builder.Services.AddAppServices();
+
+        // Registro modular por dominios
+        builder.Services.AddAppServicesDI();
 
         await using var app = builder.Build();
-        app.ConfigureButterWeb();
+
+        // Mapeo del transporte WebSocket (/ws/chat)
+        //app.MapWebSocketTransport();
+
+        // Inicialización de UI y motores
         app.Services.BootstrapEngine(ServerPort);
 
         await app.StartAsync();
+
         try
         {
+            // Mantenimiento del ciclo de vida WinForms a través del Listener de Hotkeys
             Application.Run(app.Services.GetRequiredService<NativeHotkeyListener>());
         }
         finally

@@ -28,4 +28,10 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Presentation\Windows\FloatingTriggerForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+    </ItemGroup>
+
 </Project>

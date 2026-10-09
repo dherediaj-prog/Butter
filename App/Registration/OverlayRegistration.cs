@@ -1,17 +1,18 @@
+using Engine.Entities.Overlays;
 using Engine.Presentation.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App.Registration;
 
-public static class WindowsDIRegistration
+public static class OverlayRegistration
 {
-    public static IServiceCollection AddWindowsDI(this IServiceCollection services)
+    public static IServiceCollection AddOverlayServices(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        services.AddSingleton<Overlay>();
         services.AddSingleton<PassiveOverlayForm>();
-        services.AddSingleton<NativeHotkeyListener>();
-        services.AddTransient<SelectionForm>();
+
         return services;
     }
 }
