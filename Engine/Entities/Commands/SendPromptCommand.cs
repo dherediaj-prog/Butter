@@ -32,36 +32,35 @@ public class SendPromptCommand : AsyncAppCommand<SendPromptArgs>
 
         _selector = selector;
         _promptService = promptService;
+
+        // Cada vez que cambie el proveedor activo, el comando reevalúa su estado de habilitación
+        _selector.OnActiveProviderChanged += _ => NotifyCanExecuteChanged();
     }
 
-    protected override bool CanExecuteAsync(SendPromptArgs parameter)
+    protected override bool CanExecuteAsync(SendPromptArgs? parameter)
     {
-        var hasContent = !string.IsNullOrWhiteSpace(parameter?.Prompt)
-                         || !string.IsNullOrWhiteSpace(_promptService.CurrentSystemPrompt)
-                         || (parameter?.ImageBytes is { Length: > 0 });
-
-        return hasContent && _selector.GetActiveConnectedProvider() != null;
+        // Activo siempre que exista al menos un proveedor conectado
+        return _selector.GetActiveConnectedProvider() != null;
     }
 
-    public override async Task ExecuteAsync(SendPromptArgs args, CancellationToken ct = default)
+    public override async Task ExecuteAsync(SendPromptArgs? args, CancellationToken ct = default)
     {
         var provider = _selector.GetActiveConnectedProvider();
         if (provider is null) return;
 
-        // Combinar el System Prompt persistente con el prompt ingresado por el usuario
-        string? finalPrompt = args.Prompt;
+        string? finalPrompt = args?.Prompt;
 
         if (!string.IsNullOrWhiteSpace(_promptService.CurrentSystemPrompt))
         {
-            finalPrompt = string.IsNullOrWhiteSpace(args.Prompt)
+            finalPrompt = string.IsNullOrWhiteSpace(args?.Prompt)
                 ? _promptService.CurrentSystemPrompt
                 : $"{_promptService.CurrentSystemPrompt}\n\n{args.Prompt}";
         }
 
         var payload = new PromptPayload(
             Prompt: finalPrompt,
-            Image: args.ImageBytes is { Length: > 0 } ? Convert.ToBase64String(args.ImageBytes) : null,
-            MimeType: args.MimeType
+            Image: args?.ImageBytes is { Length: > 0 } ? Convert.ToBase64String(args.ImageBytes) : null,
+            MimeType: args?.MimeType ?? "image/png"
         );
 
         await provider.SendSuccessAsync("ASK", payload, ct: ct);

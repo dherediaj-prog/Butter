@@ -14,11 +14,10 @@ public class ProviderSelectionControl : UserControl
         _manager = manager ?? throw new ArgumentNullException(nameof(manager));
         _selector = selector ?? throw new ArgumentNullException(nameof(selector));
 
-        // Configuración visual del contenedor
-        BackColor = Color.FromArgb(40, 42, 46);
+        BackColor = Color.Transparent; // Integración limpia con el menú
         ForeColor = Color.White;
-        Size = new Size(220, 160);
-        Padding = new Padding(4);
+        Size = new Size(240, 90); // Más ancho (igual que SystemPrompt) y más bajo
+        Padding = new Padding(6, 2, 6, 2);
         DoubleBuffered = true;
 
         _layoutPanel = new FlowLayoutPanel
@@ -33,12 +32,10 @@ public class ProviderSelectionControl : UserControl
 
         Controls.Add(_layoutPanel);
 
-        // Suscripción a eventos de los gestores
         _manager.OnProviderRegistered += OnProvidersStateChanged;
         _manager.OnProviderUnregistered += OnProvidersStateChanged;
         _selector.OnActiveProviderChanged += OnActiveProviderChanged;
 
-        // Renderizado inicial
         RenderProviders();
     }
 
@@ -50,7 +47,6 @@ public class ProviderSelectionControl : UserControl
     {
         _layoutPanel.SuspendLayout();
 
-        // Limpieza segura de los controles anteriores
         foreach (Control control in _layoutPanel.Controls)
         {
             control.Dispose();
@@ -68,7 +64,7 @@ public class ProviderSelectionControl : UserControl
                 Text = "No hay IAs conectadas.",
                 ForeColor = Color.Gray,
                 AutoSize = true,
-                Margin = new Padding(5, 10, 5, 0)
+                Margin = new Padding(5, 5, 5, 0)
             });
         }
         else
@@ -80,21 +76,20 @@ public class ProviderSelectionControl : UserControl
                 var btnProvider = new Button
                 {
                     Text = provider.Metadata?.Provider ?? $"Provider {provider.Id[..6]}",
-                    Width = _layoutPanel.Width - 24, // Ajuste para el ScrollBar
-                    Height = 32,
+                    Width = _layoutPanel.Width - 18, // Ajuste para el ScrollBar y padding
+                    Height = 28, // Botones más compactos
                     FlatStyle = FlatStyle.Flat,
                     Cursor = Cursors.Hand,
                     BackColor = isActive ? Color.FromArgb(65, 68, 75) : Color.FromArgb(45, 48, 53),
                     ForeColor = isActive ? Color.White : Color.Gainsboro,
                     TextAlign = ContentAlignment.MiddleLeft,
-                    Font = new Font("Segoe UI", 9f, isActive ? FontStyle.Bold : FontStyle.Regular),
-                    Margin = new Padding(2)
+                    Font = new Font("Segoe UI", 8.5f, isActive ? FontStyle.Bold : FontStyle.Regular),
+                    Margin = new Padding(1, 1, 1, 3) // Separación leve
                 };
 
                 btnProvider.FlatAppearance.BorderSize = 0;
                 btnProvider.FlatAppearance.MouseOverBackColor = Color.FromArgb(75, 78, 85);
 
-                // Acción de selección al hacer clic
                 btnProvider.Click += (_, _) => _selector.Select(provider);
 
                 _layoutPanel.Controls.Add(btnProvider);

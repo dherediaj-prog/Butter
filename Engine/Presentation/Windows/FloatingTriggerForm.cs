@@ -3,7 +3,7 @@ using Engine.Entities.Commands;
 using Engine.Entities.Commands.Extensions;
 using Engine.Entities.PanelTriggers;
 using Engine.Services.IconRenderer;
-using Engine.Services.Network; // Necesario para IPService
+using Engine.Services.Network;
 
 namespace Engine.Presentation.Windows;
 
@@ -24,7 +24,7 @@ public class FloatingTriggerForm : Form
     private readonly Panel _pnlDragHandle;
     private readonly Button _btnMainAction;
     private readonly Button _btnDropdown;
-    private readonly ContextMenuStrip _contextMenu;
+    private readonly NoActivateContextMenuStrip _contextMenu;
 
     public FloatingTriggerForm(
         PanelTrigger triggerModel,
@@ -49,7 +49,6 @@ public class FloatingTriggerForm : Form
         Location = _triggerModel.Position;
         BackColor = _triggerModel.BackColor;
 
-        // 1. Grip de Arrastre
         _pnlDragHandle = new Panel
         {
             Size = new Size(24, _triggerModel.Size.Height),
@@ -62,10 +61,8 @@ public class FloatingTriggerForm : Form
         _pnlDragHandle.MouseMove += (_, e) => { if (_triggerModel.IsDragging) _triggerModel.DragTo(PointToScreen(e.Location)); };
         _pnlDragHandle.MouseUp += (_, e) => { if (e.Button == MouseButtons.Left) _triggerModel.EndDrag(); };
 
-        // 2. Menú Desplegable con System Prompt + Proveedores + Descargas
         _contextMenu = BuildContextMenu();
 
-        // 3. Botón de Acción Principal
         _btnMainAction = new Button
         {
             Dock = DockStyle.Fill,
@@ -77,7 +74,6 @@ public class FloatingTriggerForm : Form
         _btnMainAction.Paint += (_, e) => e.Graphics.DrawIcon(FoodIcons.Croissant, _btnMainAction.ClientRectangle, _triggerModel.ButtonForeColor);
         _sendPromptCommand.BindTo(_btnMainAction, parameterSupplier: () => new SendPromptArgs(Prompt: "Procesa la selección actual"));
 
-        // 4. Botón Dropdown
         _btnDropdown = new Button
         {
             Text = "▼",
@@ -125,34 +121,32 @@ public class FloatingTriggerForm : Form
         base.WndProc(ref m);
     }
 
-    private ContextMenuStrip BuildContextMenu()
+    private NoActivateContextMenuStrip BuildContextMenu()
     {
-        var menu = new ContextMenuStrip
+        var menu = new NoActivateContextMenuStrip
         {
-            ShowImageMargin = true,
+            ShowImageMargin = false,
+            ShowCheckMargin = false,
             BackColor = _triggerModel.MenuBackColor,
             ForeColor = _triggerModel.MenuForeColor,
-            Font = _triggerModel.Font
+            Font = _triggerModel.Font,
+            Padding = new Padding(2)
         };
 
-        // 0. MOSTRAR IP LOCAL (Clic para copiar)
         var localIp = IPService.GetLocalIPAddress();
         var ipItem = new ToolStripMenuItem($"🌐 IP: {localIp}");
         ipItem.Click += (_, _) =>
         {
             Clipboard.SetText(localIp);
-            MessageBox.Show("IP copiada al portapapeles.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
         };
         menu.Items.Add(ipItem);
 
         menu.Items.Add(new ToolStripSeparator());
 
-        // 1. Comando de envío unificado (Texto e/o Imagen)
         menu.Items.Add(_sendPromptCommand.ToMenuItem(parameterSupplier: () => new SendPromptArgs(Prompt: "Procesa la selección actual")));
         
         menu.Items.Add(new ToolStripSeparator());
 
-        // 2. INCRUSTACIÓN DEL SYSTEM PROMPT CONTROL
         var promptHost = new ToolStripControlHost(_systemPromptControl)
         {
             Margin = Padding.Empty,
@@ -160,11 +154,11 @@ public class FloatingTriggerForm : Form
             AutoSize = false,
             Size = _systemPromptControl.Size
         };
+        promptHost.Control.Click += (s, e) => { /* Interceptar para no cerrar */ };
         menu.Items.Add(promptHost);
 
         menu.Items.Add(new ToolStripSeparator());
 
-        // 3. INCRUSTACIÓN DEL CONTROL DE PROVEEDORES
         var providerHost = new ToolStripControlHost(_providerControl)
         {
             Margin = Padding.Empty,
@@ -172,27 +166,24 @@ public class FloatingTriggerForm : Form
             AutoSize = false,
             Size = _providerControl.Size
         };
+        providerHost.Control.Click += (s, e) => { /* Interceptar para no cerrar */ };
         menu.Items.Add(providerHost);
 
         menu.Items.Add(new ToolStripSeparator());
 
-        // 4. DESCARGAR EXTENSIÓN CHROME
         menu.Items.Add(_downloadExtensionCommand.ToMenuItem());
 
         menu.Items.Add(new ToolStripSeparator());
 
-        // 5. Ocultar Botón
         menu.Items.Add("❌ Ocultar Botón", null, (_, _) =>
         {
             Hide();
             _triggerModel.Hide();
         });
 
-        // Refrescar el texto del prompt cada vez que se abre el menú desplegable
         menu.Opening += (_, _) =>
         {
             _systemPromptControl.RefreshPromptText();
-            // Actualiza la IP dinámicamente si cambia de red mientras la app está abierta
             ipItem.Text = $"🌐 IP: {IPService.GetLocalIPAddress()}";
         };
 
@@ -222,5 +213,40 @@ public class FloatingTriggerForm : Form
             Invoke(action);
         else
             action();
+    }
+}
+
+/// <summary>
+/// Un menú contextual personalizado que rechaza el foco y las activaciones de ventana,
+/// volviéndolo indetectable para aplicaciones que monitorean la pérdida de foco.
+/// </summary>
+/// <summary>
+/// Un menú contextual personalizado que rechaza la activación de ventana y el robo de foco,
+/// volviéndolo indetectable para aplicaciones que monitorean la pérdida de foco.
+/// </summary>
+public class NoActivateContextMenuStrip : ContextMenuStrip
+{
+    private const int WM_MOUSEACTIVATE = 0x0021;
+    private const int MA_NOACTIVATE = 3;
+    private const int WS_EX_NOACTIVATE = 0x08000000;
+
+    protected override CreateParams CreateParams
+    {
+        get
+        {
+            CreateParams cp = base.CreateParams;
+            cp.ExStyle |= WS_EX_NOACTIVATE;
+            return cp;
+        }
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+        if (m.Msg == WM_MOUSEACTIVATE)
+        {
+            m.Result = (IntPtr)MA_NOACTIVATE;
+            return;
+        }
+        base.WndProc(ref m);
     }
 }
