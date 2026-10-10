@@ -31,3 +31,6 @@
 ## --- OS Generated ---
 .DS_Store
 Thumbs.db
+
+## --- Certificados / Claves ---
+*.pem

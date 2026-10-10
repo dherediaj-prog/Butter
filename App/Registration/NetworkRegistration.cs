@@ -15,6 +15,7 @@ public static class NetworkRegistration
 
         // 1. Registrar Handlers de mensajes entrantes de WebSocket
         services.AddSingleton<IWebSocketMessageHandler, AIResponseMessageHandler>();
+        services.AddSingleton<IWebSocketMessageHandler, PingMessageHandler>(); // <--- Registrado
 
         // 2. Registrar Servicios Nucleares de Red
         services.AddSingleton<AIProviderManager>();

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detector de Actividad - Test de Transparencia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        #status-panel {
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            transition: 0.3s;
+        }
+        #status-panel.alert {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        #log-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .time {
+            color: #888;
+            margin-right: 10px;
+        }
+        .warning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Panel de Detección de Actividad</h2>
+<p>Realiza acciones como cambiar de pestaña, minimizar, sacar el ratón de la ventana o usar atajos de teclado para probar los detectores.</p>
+
+<div id="status-panel">ESTADO: ENFOCADO Y ACTIVO</div>
+
+<div id="log-container">
+    <ul id="log"></ul>
+</div>
+
+<script>
+    const logEl = document.getElementById('log');
+    const statusPanel = document.getElementById('status-panel');
+
+    function addLog(message, isWarning = true) {
+        const li = document.createElement('li');
+        const time = new Date().toLocaleTimeString();
+
+        li.innerHTML = `<span class="time">[${time}]</span> <span class="${isWarning ? 'warning' : 'info'}">${message}</span>`;
+        logEl.prepend(li);
+    }
+
+    function setAlertState(isAlert) {
+        if (isAlert) {
+            statusPanel.textContent = 'ESTADO: ALERTA - FOCO PERDIDO / ACTIVIDAD SOSPECHOSA';
+            statusPanel.classList.add('alert');
+        } else {
+            statusPanel.textContent = 'ESTADO: ENFOCADO Y ACTIVO';
+            statusPanel.classList.remove('alert');
+        }
+    }
+
+    // 1. Detección de Visibilidad (Cambio de pestaña o minimizar navegador)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            addLog('⚠️ La pestaña se ocultó (Cambio de pestaña o navegador minimizado).');
+            setAlertState(true);
+        } else {
+            addLog('ℹ️ La pestaña volvió a ser visible.', false);
+            setAlertState(false);
+        }
+    });
+
+    // 2. Detección de Foco (Clic en otra aplicación, barra de tareas, o segundo monitor)
+    window.addEventListener('blur', () => {
+        addLog('⚠️ La ventana perdió el foco (Clic fuera del navegador).');
+        setAlertState(true);
+    });
+
+    window.addEventListener('focus', () => {
+        addLog('ℹ️ La ventana recuperó el foco.', false);
+        setAlertState(false);
+    });
+
+    // 3. Detección del Ratón (El cursor sale del área de renderizado web)
+    document.addEventListener('mouseleave', () => {
+        addLog('⚠️ El cursor del ratón salió del área de la ventana.');
+    });
+
+    // 4. Detección de Portapapeles (Copiar / Pegar / Cortar)
+    document.addEventListener('copy', (e) => {
+        addLog('⚠️ Intento de COPIAR texto.');
+        e.preventDefault(); // Descomentar para bloquear la acción
+    });
+    document.addEventListener('paste', (e) => {
+        addLog('⚠️ Intento de PEGAR texto.');
+        e.preventDefault();
+    });
+    document.addEventListener('cut', (e) => {
+        addLog('⚠️ Intento de CORTAR texto.');
+        e.preventDefault();
+    });
+
+    // 5. Detección de Clic Derecho (Menú contextual)
+    document.addEventListener('contextmenu', (e) => {
+        addLog('⚠️ Intento de abrir el MENÚ CONTEXTUAL (Clic derecho).');
+        // e.preventDefault(); // Descomentar para bloquear clic derecho
+    });
+
+    // 6. Detección de Atajos de Teclado (F12, Ctrl+C, Ctrl+V, Imprimir Pantalla)
+    document.addEventListener('keydown', (e) => {
+        // Imprimir pantalla / Atajos comunes
+        if (e.key === 'PrintScreen' || e.key === 'F12') {
+            addLog(`⚠️ Intento de usar tecla restringida: ${e.key}`);
+        }
+        // Ctrl + Atajos (Herramientas de desarrollador, copiar, buscar)
+        if (e.ctrlKey || e.metaKey) {
+            const key = e.key.toLowerCase();
+            if (['c', 'v', 'x', 'p', 'f', 's', 'u'].includes(key)) {
+                addLog(`⚠️ Intento de usar atajo de teclado: Ctrl + ${key.toUpperCase()}`);
+            }
+        }
+    });
+
+    // 7. Detección de Selección de Texto
+    document.addEventListener('selectstart', () => {
+        addLog('⚠️ Intento de seleccionar texto en la página.');
+    });
+</script>
+</body>
+</html>

@@ -3,6 +3,7 @@ using Engine.Entities.Commands;
 using Engine.Entities.Commands.Extensions;
 using Engine.Entities.PanelTriggers;
 using Engine.Services.IconRenderer;
+using Engine.Services.Network; // Necesario para IPService
 
 namespace Engine.Presentation.Windows;
 
@@ -134,6 +135,18 @@ public class FloatingTriggerForm : Form
             Font = _triggerModel.Font
         };
 
+        // 0. MOSTRAR IP LOCAL (Clic para copiar)
+        var localIp = IPService.GetLocalIPAddress();
+        var ipItem = new ToolStripMenuItem($"🌐 IP: {localIp}");
+        ipItem.Click += (_, _) =>
+        {
+            Clipboard.SetText(localIp);
+            MessageBox.Show("IP copiada al portapapeles.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        };
+        menu.Items.Add(ipItem);
+
+        menu.Items.Add(new ToolStripSeparator());
+
         // 1. Comando de envío unificado (Texto e/o Imagen)
         menu.Items.Add(_sendPromptCommand.ToMenuItem(parameterSupplier: () => new SendPromptArgs(Prompt: "Procesa la selección actual")));
         
@@ -163,7 +176,7 @@ public class FloatingTriggerForm : Form
 
         menu.Items.Add(new ToolStripSeparator());
 
-        // 4. DESCARGAR EXTENSIÓN CHROME (.CRX)
+        // 4. DESCARGAR EXTENSIÓN CHROME
         menu.Items.Add(_downloadExtensionCommand.ToMenuItem());
 
         menu.Items.Add(new ToolStripSeparator());
@@ -179,6 +192,8 @@ public class FloatingTriggerForm : Form
         menu.Opening += (_, _) =>
         {
             _systemPromptControl.RefreshPromptText();
+            // Actualiza la IP dinámicamente si cambia de red mientras la app está abierta
+            ipItem.Text = $"🌐 IP: {IPService.GetLocalIPAddress()}";
         };
 
         return menu;

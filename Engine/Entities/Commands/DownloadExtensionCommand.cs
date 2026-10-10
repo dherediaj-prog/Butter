@@ -1,27 +1,34 @@
 using System.Diagnostics;
+using System.Windows.Forms;
+using Engine.Entities.Commands.Model;
 
 namespace Engine.Entities.Commands;
 
 public class DownloadExtensionCommand : AppCommand
 {
-    private readonly string _downloadUrl;
+    private readonly string _baseUrl;
 
-    public DownloadExtensionCommand(string downloadUrl = "http://localhost:5000/download/extension")
+    public DownloadExtensionCommand(string baseUrl = "http://localhost:5000/download/extension")
         : base(
-            title: "Descargar Extensión (.crx)",
-            description: "Abre el navegador predeterminado para descargar el paquete de la extensión.")
+            title: "Descargar Extensión (.zip)", // Cambiado a .zip
+            description: "Abre el navegador para descargar el paquete ZIP de la extensión.")
     {
-        _downloadUrl = downloadUrl;
+        _baseUrl = baseUrl;
     }
 
     public override void Execute()
     {
         try
         {
-            // Abre la URL en el navegador predeterminado de forma instantánea sin bloquear la UI
+            // Agregamos un timestamp único a la URL para ROMPER LA CACHÉ de Chrome.
+            // Esto hace que Chrome piense que es una URL totalmente nueva y no aplique
+            // su bloqueo de seguridad en caché de las descargas anteriores.
+            var cacheBusterUrl = $"{_baseUrl}?t={DateTime.UtcNow.Ticks}";
+
+            // Abre la URL en el navegador predeterminado
             Process.Start(new ProcessStartInfo
             {
-                FileName = _downloadUrl,
+                FileName = cacheBusterUrl,
                 UseShellExecute = true
             });
         }

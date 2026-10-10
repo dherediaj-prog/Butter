@@ -9,28 +9,32 @@ namespace App.Bootstrapping;
 
 public static class NetworkBootstrap
 {
-    /// <summary>
-    /// Habilita los WebSockets en Kestrel, expone el endpoint de descarga del .crx y mapea la ruta del transporte.
-    /// </summary>
     public static WebApplication BootstrapNetwork(this WebApplication app, string routePath = "/ws/chat")
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        // 1. Forzar la instanciación del Singleton para asegurar la suscripción de eventos
+        // 1. Forzar la instanciación del Singleton
         _ = app.Services.GetRequiredService<MessageDispatcher>();
 
-        // 2. Habilitar el middleware nativo de WebSockets
+        // 2. Habilitar WebSockets
         app.UseWebSockets();
 
-        // 3. Endpoint HTTP para la descarga limpia de la extensión Chrome (.crx)
-        app.MapGet("/download/extension", (IWebHostEnvironment env) =>
-        {
-            const string relativePath = "ExtensionV2/extension.crx";
+        // 3. Mapeo de la página del detector
+        app.MapGet("/detector", ServeDetectorPage);
+        app.MapGet("/test", ServeDetectorPage);
+        app.MapGet("/", ServeDetectorPage);
 
-            // Intenta ubicar la extensión en wwwroot
+        // 4. Endpoint HTTP para la descarga del archivo ZIP estático
+        app.MapGet("/download/extension", (IWebHostEnvironment env, HttpContext context) =>
+        {
+            // Evitar que el navegador use una versión en caché bloqueada anteriormente
+            context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+            context.Response.Headers.Expires = "0";
+
+            // Apuntamos directamente al archivo ZIP que creaste
+            const string relativePath = "ExtensionV2/ExtensionV2.zip";
             var fullPath = Path.Combine(env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot"), relativePath);
 
-            // Fallback dinámico usando el directorio base de ejecución (sin rutas fijas de usuario)
             if (!File.Exists(fullPath))
             {
                 fullPath = Path.Combine(AppContext.BaseDirectory, "Presentation", "Web", "wwwroot", relativePath);
@@ -38,16 +42,17 @@ public static class NetworkBootstrap
 
             if (!File.Exists(fullPath))
             {
-                return Results.NotFound("El archivo 'extension.crx' no fue encontrado en el servidor.");
+                return Results.NotFound("El archivo 'ExtensionV2.zip' no fue encontrado en el servidor.");
             }
 
+            // Retornamos el archivo ZIP directamente
             return Results.File(
                 fullPath,
-                contentType: "application/x-chrome-extension",
-                fileDownloadName: "extension.crx");
+                contentType: "application/zip",
+                fileDownloadName: "ExtensionV2.zip");
         });
 
-        // 4. Mapear la ruta HTTP especificada hacia el WebSocketTransport
+        // 5. Mapear WebSocketTransport
         app.Map(routePath, async context =>
         {
             var transport = context.RequestServices.GetRequiredService<WebSocketTransport>();
@@ -55,5 +60,23 @@ public static class NetworkBootstrap
         });
 
         return app;
+    }
+
+    private static IResult ServeDetectorPage(IWebHostEnvironment env)
+    {
+        var relativePath = Path.Combine("Test", "index.html");
+        var fullPath = Path.Combine(env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot"), relativePath);
+
+        if (!File.Exists(fullPath))
+        {
+            fullPath = Path.Combine(AppContext.BaseDirectory, "Presentation", "Web", "wwwroot", relativePath);
+        }
+
+        if (!File.Exists(fullPath))
+        {
+            return Results.NotFound("No se encontró el archivo 'Test/index.html' en el servidor.");
+        }
+
+        return Results.File(fullPath, "text/html");
     }
 }
