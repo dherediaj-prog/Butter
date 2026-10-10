@@ -44,7 +44,10 @@ wsClient.onMessage = async (envelope) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "CS2C_SEND_ENVELOPE") {
         const envelope = ProviderEnvelope.from(message.envelope);
-        wsClient.send(envelope);
+        const delivered = wsClient.send(envelope);
+
+        // 1. Responder al callback de MessageSender en el Content Script
+        sendResponse({ ack: true, delivered });
     }
 
     // Consulta de estado desde el Popup UI
@@ -54,6 +57,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             url: wsClient.url
         });
     }
+
+    // 2. Retornar true mantiene abierto el canal de comunicación en Chrome
+    return true;
 });
 
 async function startServerConnection() {

@@ -19,14 +19,18 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
     {
         ArgumentNullException.ThrowIfNull(responseDisplay);
         _responseDisplay = responseDisplay;
+        Console.WriteLine("[AIResponseMessageHandler] 🛠️ Handler inicializado.");
     }
 
     public Task HandleAsync(AIProvider client, ProviderEnvelope<JsonElement> envelope, CancellationToken ct = default)
     {
+        Console.WriteLine($"[AIResponseMessageHandler] 📥 Evento 'AI_RESPONSE' recibido [ID: {envelope.Id}] | Status: {envelope.Status}");
+
         switch (envelope.Status)
         {
             case ProviderStatus.Loading:
             case ProviderStatus.Processing:
+                Console.WriteLine($"[AIResponseMessageHandler] ⏳ Notificación de estado activo ({envelope.Status}). Actualizando UI...");
                 _responseDisplay.UpdateResponseText("⏳ Procesando consulta...");
                 _responseDisplay.SetVisibility(true);
                 break;
@@ -35,6 +39,8 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
                 var payload = envelope.GetPayload<ResponsePayload>();
                 string textResult = payload?.Text ?? string.Empty;
 
+                Console.WriteLine($"[AIResponseMessageHandler] 🎉 Respuesta completada recibida ({textResult.Length} chars) desde {payload?.ProviderName ?? "desconocido"}.");
+
                 _responseDisplay.UpdateResponseText(string.IsNullOrWhiteSpace(textResult) ? "͡° ͜ʖ ͡°" : textResult);
                 _responseDisplay.SetVisibility(true);
                 break;
@@ -42,8 +48,15 @@ public class AIResponseMessageHandler : IWebSocketMessageHandler
             case ProviderStatus.Failed:
                 string errorMessage =
                     envelope.Error?.Message ?? "Ocurrió un error inesperado al procesar la respuesta.";
+
+                Console.WriteLine($"[AIResponseMessageHandler] ❌ Error recibido [Código: {envelope.Error?.Code}]: {errorMessage}");
+
                 _responseDisplay.UpdateResponseText($"❌ Error: {errorMessage}");
                 _responseDisplay.SetVisibility(true);
+                break;
+
+            default:
+                Console.WriteLine($"[AIResponseMessageHandler] ⚠️ Estado no manejado: {envelope.Status}");
                 break;
         }
 

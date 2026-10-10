@@ -1,3 +1,4 @@
+using Engine.Entities.Network.MessageHandler;
 using Engine.Entities.Network.Transport;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +14,13 @@ public static class NetworkBootstrap
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        // 1. Habilita el middleware nativo de WebSockets en ASP.NET Core
+        // 1. Forzar la instanciación del Singleton para que ejecute su constructor
+        _ = app.Services.GetRequiredService<MessageDispatcher>();
+
+        // 2. Habilita los WebSockets
         app.UseWebSockets();
 
-        // 2. Mapea la ruta HTTP especificada hacia el WebSocketTransport
+        // 3. Mapea la ruta HTTP
         app.Map(routePath, async context =>
         {
             var transport = context.RequestServices.GetRequiredService<WebSocketTransport>();
