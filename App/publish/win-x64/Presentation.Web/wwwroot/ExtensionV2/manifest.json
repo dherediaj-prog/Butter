@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "ButterKnife Engine Connector",
+  "version": "1.0.0",
+  "description": "Conector entre el motor C# WinForms y proveedores web de IA.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://gemini.google.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "backgroundContent.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*"
+      ],
+      "js": [
+        "loader.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content.js",
+        "Entities/*",
+        "Entities/**/*",
+        "Services/*",
+        "Services/**/*"
+      ],
+      "matches": [
+        "https://gemini.google.com/*"
+      ]
+    }
+  ]
+}

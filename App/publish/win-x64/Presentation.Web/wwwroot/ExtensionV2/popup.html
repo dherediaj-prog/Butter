@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: 240px;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 12px;
+            margin: 0;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+        }
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #313244;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            flex-shrink: 0;
+        }
+        .dot.connected {
+            background-color: #22c55e;
+        }
+        .info {
+            font-size: 11px;
+            color: #a6adc8;
+            word-break: break-all;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .config-group {
+            margin-bottom: 10px;
+        }
+        .config-group label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #bac2de;
+        }
+        .config-row {
+            display: flex;
+            gap: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 6px;
+            background: #313244;
+            border: 1px solid #45475a;
+            border-radius: 4px;
+            color: #cdd6f4;
+            font-family: monospace;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #89b4fa;
+        }
+        input#inputPort {
+            width: 60px;
+        }
+        button {
+            width: 100%;
+            margin-top: 5px;
+            padding: 8px;
+            background: #89b4fa;
+            border: none;
+            border-radius: 4px;
+            color: #11111b;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #b4befe;
+        }
+        .btn-secondary {
+            background: #45475a;
+            color: #cdd6f4;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background: #585b70;
+        }
+    </style>
+</head>
+<body>
+
+<div class="status-container">
+    <div id="statusDot" class="dot"></div>
+    <strong id="statusText">Desconectado</strong>
+</div>
+
+<div id="serverUrl" class="info">ws://...</div>
+
+<div class="config-group">
+    <label>Dirección del Servidor (WinForms)</label>
+    <div class="config-row">
+        <input type="text" id="inputIp" placeholder="Ej: 192.168.1.100" />
+        <input type="number" id="inputPort" placeholder="5000" value="5000" />
+    </div>
+</div>
+
+<button id="btnConnect">Conectar</button>
+<button id="btnReconnect" class="btn-secondary">Forzar Reinicio del Worker</button>
+
+<script type="module" src="popup.js"></script>
+</body>
+</html>

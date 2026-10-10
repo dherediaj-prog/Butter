@@ -7,7 +7,17 @@
 *.userosscache
 *.sln.docstates
 
-## --- NuGet ---
+# Ignorar ejecutables y binarios compilados
+*.exe
+*.dll
+*.pdb
+*.mdb
+*.zip
+*.tar
+*.gz
+*.7z
+
+# Ignorar paquetes NuGet
 *.nuget.props
 *.nuget.targets
 *.nupkg
@@ -31,6 +41,3 @@
 ## --- OS Generated ---
 .DS_Store
 Thumbs.db
-
-## --- Certificados / Claves ---
-*.pem
