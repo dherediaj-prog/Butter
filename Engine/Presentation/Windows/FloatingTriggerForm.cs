@@ -18,6 +18,7 @@ public class FloatingTriggerForm : Form
     private readonly SendPromptCommand _sendPromptCommand;
     private readonly ProviderSelectionControl _providerControl;
     private readonly SystemPromptControl _systemPromptControl;
+    private readonly DownloadExtensionCommand _downloadExtensionCommand;
 
     private readonly Panel _pnlDragHandle;
     private readonly Button _btnMainAction;
@@ -28,12 +29,14 @@ public class FloatingTriggerForm : Form
         PanelTrigger triggerModel,
         SendPromptCommand sendPromptCommand,
         ProviderSelectionControl providerControl,
-        SystemPromptControl systemPromptControl)
+        SystemPromptControl systemPromptControl,
+        DownloadExtensionCommand downloadExtensionCommand)
     {
         _triggerModel = triggerModel ?? throw new ArgumentNullException(nameof(triggerModel));
         _sendPromptCommand = sendPromptCommand ?? throw new ArgumentNullException(nameof(sendPromptCommand));
         _providerControl = providerControl ?? throw new ArgumentNullException(nameof(providerControl));
         _systemPromptControl = systemPromptControl ?? throw new ArgumentNullException(nameof(systemPromptControl));
+        _downloadExtensionCommand = downloadExtensionCommand ?? throw new ArgumentNullException(nameof(downloadExtensionCommand));
 
         FormBorderStyle = FormBorderStyle.None;
         ShowInTaskbar = false;
@@ -58,7 +61,7 @@ public class FloatingTriggerForm : Form
         _pnlDragHandle.MouseMove += (_, e) => { if (_triggerModel.IsDragging) _triggerModel.DragTo(PointToScreen(e.Location)); };
         _pnlDragHandle.MouseUp += (_, e) => { if (e.Button == MouseButtons.Left) _triggerModel.EndDrag(); };
 
-        // 2. Menú Desplegable con System Prompt + Proveedores
+        // 2. Menú Desplegable con System Prompt + Proveedores + Descargas
         _contextMenu = BuildContextMenu();
 
         // 3. Botón de Acción Principal
@@ -160,7 +163,12 @@ public class FloatingTriggerForm : Form
 
         menu.Items.Add(new ToolStripSeparator());
 
-        // 4. Ocultar Botón
+        // 4. DESCARGAR EXTENSIÓN CHROME (.CRX)
+        menu.Items.Add(_downloadExtensionCommand.ToMenuItem());
+
+        menu.Items.Add(new ToolStripSeparator());
+
+        // 5. Ocultar Botón
         menu.Items.Add("❌ Ocultar Botón", null, (_, _) =>
         {
             Hide();

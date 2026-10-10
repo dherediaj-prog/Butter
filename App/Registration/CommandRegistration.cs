@@ -19,6 +19,8 @@ public static class CommandRegistration
         services.AddSingleton<SetSystemPromptCommand>();
         services.AddSingleton<SendPromptCommand>();
 
+        services.AddSingleton<DownloadExtensionCommand>();
+
         return services;
     }
 }
