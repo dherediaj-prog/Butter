@@ -29,12 +29,6 @@ public static class SelectionBootstrap
             try
             {
                 responseDisplay.SetPosition(bounds.X, bounds.Y);
-
-                // Ubicación en la esquina superior derecha del área seleccionada
-                int triggerX = bounds.Right - panelTrigger.Size.Width;
-                int triggerY = bounds.Top - (panelTrigger.Size.Height / 2);
-
-                panelTrigger.SetPosition(triggerX, triggerY);
                 panelTrigger.Show();
 
                 var imageBytes = captureService.CaptureRegion(bounds);

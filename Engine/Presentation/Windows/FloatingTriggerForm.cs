@@ -17,6 +17,7 @@ public class FloatingTriggerForm : Form
     private readonly PanelTrigger _triggerModel;
     private readonly SendPromptCommand _sendPromptCommand;
     private readonly ProviderSelectionControl _providerControl;
+    private readonly SystemPromptControl _systemPromptControl;
 
     private readonly Panel _pnlDragHandle;
     private readonly Button _btnMainAction;
@@ -26,11 +27,13 @@ public class FloatingTriggerForm : Form
     public FloatingTriggerForm(
         PanelTrigger triggerModel,
         SendPromptCommand sendPromptCommand,
-        ProviderSelectionControl providerControl)
+        ProviderSelectionControl providerControl,
+        SystemPromptControl systemPromptControl)
     {
         _triggerModel = triggerModel ?? throw new ArgumentNullException(nameof(triggerModel));
         _sendPromptCommand = sendPromptCommand ?? throw new ArgumentNullException(nameof(sendPromptCommand));
         _providerControl = providerControl ?? throw new ArgumentNullException(nameof(providerControl));
+        _systemPromptControl = systemPromptControl ?? throw new ArgumentNullException(nameof(systemPromptControl));
 
         FormBorderStyle = FormBorderStyle.None;
         ShowInTaskbar = false;
@@ -55,7 +58,7 @@ public class FloatingTriggerForm : Form
         _pnlDragHandle.MouseMove += (_, e) => { if (_triggerModel.IsDragging) _triggerModel.DragTo(PointToScreen(e.Location)); };
         _pnlDragHandle.MouseUp += (_, e) => { if (e.Button == MouseButtons.Left) _triggerModel.EndDrag(); };
 
-        // 2. Menú Desplegable (Alojamiento de UI de proveedores)
+        // 2. Menú Desplegable con System Prompt + Proveedores
         _contextMenu = BuildContextMenu();
 
         // 3. Botón de Acción Principal
@@ -128,28 +131,47 @@ public class FloatingTriggerForm : Form
             Font = _triggerModel.Font
         };
 
-        // Comando de envío unificado (Texto e/o Imagen)
+        // 1. Comando de envío unificado (Texto e/o Imagen)
         menu.Items.Add(_sendPromptCommand.ToMenuItem(parameterSupplier: () => new SendPromptArgs(Prompt: "Procesa la selección actual")));
         
         menu.Items.Add(new ToolStripSeparator());
-        
-        // --- INCRUSTACIÓN DEL USER CONTROL MEDIANTE HOST ---
-        var host = new ToolStripControlHost(_providerControl)
+
+        // 2. INCRUSTACIÓN DEL SYSTEM PROMPT CONTROL
+        var promptHost = new ToolStripControlHost(_systemPromptControl)
+        {
+            Margin = Padding.Empty,
+            Padding = Padding.Empty,
+            AutoSize = false,
+            Size = _systemPromptControl.Size
+        };
+        menu.Items.Add(promptHost);
+
+        menu.Items.Add(new ToolStripSeparator());
+
+        // 3. INCRUSTACIÓN DEL CONTROL DE PROVEEDORES
+        var providerHost = new ToolStripControlHost(_providerControl)
         {
             Margin = Padding.Empty,
             Padding = Padding.Empty,
             AutoSize = false,
             Size = _providerControl.Size
         };
-        menu.Items.Add(host);
-        // ---------------------------------------------------
+        menu.Items.Add(providerHost);
 
         menu.Items.Add(new ToolStripSeparator());
+
+        // 4. Ocultar Botón
         menu.Items.Add("❌ Ocultar Botón", null, (_, _) =>
         {
             Hide();
             _triggerModel.Hide();
         });
+
+        // Refrescar el texto del prompt cada vez que se abre el menú desplegable
+        menu.Opening += (_, _) =>
+        {
+            _systemPromptControl.RefreshPromptText();
+        };
 
         return menu;
     }

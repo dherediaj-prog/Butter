@@ -11,6 +11,7 @@ public static class PanelTriggerRegistration
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddSingleton<PanelTrigger>();
+        services.AddTransient<SystemPromptControl>();
         services.AddTransient<FloatingTriggerForm>();
 
         return services;

@@ -125,25 +125,54 @@ export class GeminiProvider extends IIAProvider {
 
     /**
      * Observa las mutaciones del DOM hasta que la IA termine de responder.
-     * @param {number} initialCount Cantidad de respuestas existentes antes de enviar.
+     * @param {number} [forcedInitialCount] Cantidad previa de respuestas (opcional).
      * @returns {Promise<string>}
      */
-    async observeResponse(initialCount = 0) {
+    /**
+     * Observa las mutaciones del DOM hasta que la IA termine de responder.
+     * @param {number} [forcedInitialCount] Cantidad previa de respuestas (opcional).
+     * @param {number} [settleDelayMs=250] Margen en milisegundos para permitir que la animación/renderizado finalice.
+     * @returns {Promise<string>}
+     */
+    async observeResponse(forcedInitialCount, settleDelayMs = 250) {
         return new Promise((resolve) => {
-            let started = false;
-            const observer = new MutationObserver(() => {
+            const currentResponses = document.querySelectorAll(this.selectors.assistantResponse);
+            const initialCount = forcedInitialCount ?? currentResponses.length;
+
+            let hasStarted = false;
+            let isResolving = false;
+
+            const observer = new MutationObserver(async () => {
+                // Evita reentradas concurrentes mientras corre el margen de estabilización
+                if (isResolving) return;
+
                 const isStop = !!document.querySelector(this.selectors.stopIcon);
                 const isMic = !!document.querySelector(this.selectors.micIcon);
                 const responses = document.querySelectorAll(this.selectors.assistantResponse);
 
-                if (isStop || responses.length > initialCount) started = true;
+                const targetIndex = initialCount;
+                const targetResponseNode = responses[targetIndex];
 
-                if (started && isMic && !isStop && responses.length > initialCount) {
-                    const last = responses[responses.length - 1];
-                    const text = last?.innerText?.trim() || '';
-                    if (text) {
+                // 1. Detectar el inicio efectivo de la generación
+                if (isStop || (targetResponseNode && targetResponseNode.innerText.trim().length > 0)) {
+                    hasStarted = true;
+                }
+
+                // 2. Detectar la condición de término en la UI
+                if (hasStarted && isMic && !isStop && targetResponseNode) {
+                    const text = targetResponseNode.innerText?.trim() || '';
+
+                    if (text.length > 0) {
+                        isResolving = true;
+
+                        // 3. Pausa breve para permitir que la animación del DOM se asiente
+                        await new Promise(r => setTimeout(r, settleDelayMs));
+
+                        // 4. Capturar el texto completo tras la animación
+                        const finalText = targetResponseNode.innerText?.trim() || text;
+
                         observer.disconnect();
-                        resolve(text);
+                        resolve(finalText);
                     }
                 }
             });
